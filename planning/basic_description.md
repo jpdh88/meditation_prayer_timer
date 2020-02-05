@@ -7,14 +7,14 @@ E.g. you might want to do technique x for 20 minutes, then begin technique y for
 ## Examples of sessions
 
 ### Simplest:
- 0----------0       where 0 = primary bell tone, - = one minute
+ O----------O       where O = primary bell tone, - = one minute
 
 ### Two stages:
- 0-----*-----0      * = secondary bell tone
+ O-----o-----O      o = secondary bell tone
 
 ### Four stages:
- 0--------------------*---*---*---0
+ O--------------------o---o---o---O
 
 ### Crazy:
- 0---*-----*--*--------*-----------*--*-*--*-0
+ O---o-----o--o--------o-----------o--o-o--o-O
  (but this should be possible)
