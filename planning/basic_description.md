@@ -22,8 +22,7 @@ E.g. you might want to do technique x for 20 minutes, then begin technique y for
 ## Basic Plan
 
 A session will be represented by a Sequence (a length of time).
-A Sequence will be composed of Primary Sequences and Secondary Sequences (each a length of time).
-A Primary Sequence will always begin with the Primary Sound.
-A Secondary Sequence will always begin with a Secondary Sound.
-Each Sequence will have a maximum of two Primary Sequences. The first Primary Sequence will start the session and can be any length. The second Primary Sequence will end the session and will be of length 0 (really, it will be the length of the Primary Sound clip, but it won't have any independent duration)
-Secondary Sequences are inserted between the two Primary Sequences.
+A Sequence will be composed of SubSequences.
+A SubSequence is composed of a sound and a duration. A sound is played and the duration timer begins.
+The first SubSequence in the sequence must use primary sound; the last Subsequence in the sequence must use Primary sound and be of duration 0 (really, duration of Primary sound)
+SubSequences in between the first and last SubSequences use Secondary sound and have a duration > 0.
