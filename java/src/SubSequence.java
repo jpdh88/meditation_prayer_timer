@@ -87,11 +87,10 @@ public class SubSequence {
     // *** Utility methods
     @Override
     public String toString() {
-        String output = "duration: " + duration +
-                        "\nsoundPath: " + soundPath +
-                        "\n\tdefaultSoundPath: " + primarySoundPath +
-                        "\n\tsecondarySoundPath: " + secondarySoundPath;
-        return output;
+        return  "dur: " + String.format("%6d", duration) +
+                "\t\tsoundPath: " + soundPath +
+                "\t\t(defaultSoundPath: " + primarySoundPath +
+                "\t\tsecondarySoundPath: " + secondarySoundPath + ")";
     }
 
     // MAIN METHOD FOR TESTING
