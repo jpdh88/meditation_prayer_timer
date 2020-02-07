@@ -78,6 +78,11 @@ public class Sequence {
         }
     }
 
+    /**
+     * Swap two SubSequences' positions
+     * @param index1 One of the SubSequences to be swapped
+     * @param index2 One of the SubSequences to be swapped
+     */
     public void swapSubSequences (int index1, int index2) {
         if (    index1 == 0 ||
                 index1 == subSequenceArray.size() - 1 ||

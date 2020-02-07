@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -11,9 +10,11 @@ public class InterfaceCommandLine {
     private static Sequence userSequence = new Sequence();
     // For user input with the keyboard
     private static Scanner keybIn = new Scanner(System.in);
-    private static int userInput;
-    private static int userInput2;
 
+    /**
+     * Method for editing a meditation session (i.e. a Sequence object)
+     * Presents and controls the command line user interface
+     */
     public static void editSequence() {
         boolean doneLvl2 = false;
         while (!doneLvl2) {
@@ -29,7 +30,7 @@ public class InterfaceCommandLine {
             System.out.println("\t6) Change Primary Sound");
             System.out.println("\t7) Change Secondary Sound");
             System.out.println("\t0) Exit");
-            userInput = keybIn.nextInt();
+            int userInput = keybIn.nextInt();
 
             switch (userInput) {
                 case 0:
@@ -110,7 +111,7 @@ public class InterfaceCommandLine {
     }
 
     /**
-     * Main method for this interface
+     * Main method for the Command Line interface
      * @param args
      */
     public static void main(String[] args) {
