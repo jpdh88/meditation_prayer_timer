@@ -5,11 +5,12 @@ import java.util.ArrayList;
  *  - Essentially, a Sequence object will be an array of SubSequences.
  *  - The first SubSequence must use the primary sound
  *  - The last SubSequence must use the primary sound and be of length 0
+ * @author Joseph Haley
  */
 public class Sequence {
     // VARIABLES
     /** Array of SubSequences **/
-    ArrayList<SubSequence> subSequenceArray = new ArrayList<>();
+    private ArrayList<SubSequence> subSequenceArray = new ArrayList<>();
 
     // METHODS
     // *** Constructors
@@ -23,6 +24,13 @@ public class Sequence {
 
     // *** Variable methods
 
+    /**
+     * Get the SubSequenceArray
+     * @return The subSequenceArray
+     */
+    public ArrayList getSequenceArray() {
+        return subSequenceArray;
+    }
     /**
      * Creates a new SubSequence and inserts it at index location in subSequenceArray
      * @param index The location in subSequenceArray Where the new SubSequence is to be added
@@ -69,7 +77,7 @@ public class Sequence {
 
     // *** Utility methods
     /**
-     * to String method
+     * toString method
      * @return A representation of the object in String form
      */
     @Override
@@ -83,6 +91,7 @@ public class Sequence {
 
     // MAIN METHOD FOR TESTING
     public static void main(String[] args) {
+        /*
         Sequence my_sequence = new Sequence();
         my_sequence.addSubSequence(500);
         my_sequence.addSubSequence(15);
@@ -92,5 +101,7 @@ public class Sequence {
         System.out.println(my_sequence);
         my_sequence.editSubSequence(4, 900);
         System.out.println(my_sequence);
+
+         */
     }
 }

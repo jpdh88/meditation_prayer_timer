@@ -1,5 +1,6 @@
 /**
  * Represents a SubSequence object.
+ * @author Joseph Haley
  */
 public class SubSequence {
     // VARIABLES
@@ -8,17 +9,13 @@ public class SubSequence {
      **/
     private int duration; // in seconds
     /**
-     * Primary sound is for first and last SubSequences
-     **/
-    private final String primarySoundPath = "primary sound";
+     * The sound associated w/ the SubSequence
+     */
+    private int sound; // represents index of array of file paths
     /**
-     * Secondary sound is for intervening SubSequences
+     * Sounds that can be associated w/ the SubSequence
      **/
-    private final String secondarySoundPath = "secondary sound";
-    /**
-     * The sound that will start this sequence
-     **/
-    private String soundPath;
+    String[] soundList = {"Primary sound", "Secondary sound", "other sound", "another sound"};
 
     // METHODS
     // *** Constructors
@@ -29,11 +26,11 @@ public class SubSequence {
         switch (firstOrLast) {
             case "first":
                duration = 1800;
-               soundPath = primarySoundPath; // a default SubSequence has a length of 30 minutes
+               sound = 0; // a default SubSequence has a length of 30 minutes
                break;
             case "last":
                 duration = 0;
-                soundPath = primarySoundPath;
+                sound = 0;
                 break;
         }
     }
@@ -43,7 +40,7 @@ public class SubSequence {
      */
     public SubSequence(int duration) {
         this.duration = duration;
-        soundPath = secondarySoundPath;
+        sound = 1;
     }
 
     // *** Variable methods
@@ -69,10 +66,10 @@ public class SubSequence {
     /**
      * Set the sound to be used at the beginning of the sequence
      *
-     * @param soundPath Full path to the sound file
+     * @param sound Full path to the sound file
      */
-    public void setSound(String soundPath) {
-        this.soundPath = soundPath;
+    public void setSound(int sound) {
+        this.sound = sound;
     }
 
     /**
@@ -80,17 +77,16 @@ public class SubSequence {
      *
      * @return Full path to the sound file
      */
-    public String getSound() {
-        return soundPath;
+    public int getSound() {
+        return sound;
     }
 
     // *** Utility methods
     @Override
     public String toString() {
         return  "dur: " + String.format("%6d", duration) +
-                "\t\tsoundPath: " + soundPath +
-                "\t\t(defaultSoundPath: " + primarySoundPath +
-                "\t\tsecondarySoundPath: " + secondarySoundPath + ")";
+                "\t\tsound: " + sound +
+                "\t\t(soundPath: " + soundList[sound] + ")";
     }
 
     // MAIN METHOD FOR TESTING
