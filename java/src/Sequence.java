@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Represents a Sequence object. This object will be used to set up a meditation session.
@@ -56,7 +57,11 @@ public class Sequence {
      * @param duration The duration of the new SubSequence
      */
     public void addSubSequence(int duration) {
-        this.addSubSequence(duration, subSequenceArray.size() - 1);
+        if (duration >= 0) {
+            this.addSubSequence(duration, subSequenceArray.size() - 1);
+        } else {
+            System.out.println("Sequence Class Error: Duration must be a positive integer");
+        }
     }
 
     /**
@@ -69,7 +74,21 @@ public class Sequence {
         if (index < subSequenceArray.size() - 1) {
             subSequenceArray.get(index).setDuration(newDuration);
         } else {
-            System.out.println("SubSequence Class Error: You can't edit that SubSequence");
+            System.out.println("Sequence Class Error: You can't edit that SubSequence");
+        }
+    }
+
+    public void swapSubSequences (int index1, int index2) {
+        if (    index1 == 0 ||
+                index1 == subSequenceArray.size() - 1 ||
+                index2 == 0 ||
+                index2 == subSequenceArray.size() - 1 ) {
+            System.out.println("Sequence Class Error: You can't swap those SubSequences");
+        } else if ( index1 >= subSequenceArray.size() ||
+                    index2 >= subSequenceArray.size() ) {
+            System.out.println("Sequence Class Error: One or more indexes are out of range");
+        } else {
+            Collections.swap(subSequenceArray, index1, index2);
         }
     }
 
@@ -80,7 +99,7 @@ public class Sequence {
      */
     public void removeSubSequence(int subSequence) {
         if (subSequence >= subSequenceArray.size() - 1) {
-            System.out.println("Invalid index.");
+            System.out.println("Sequence Class Error: Invalid index.");
         } else {
             subSequenceArray.remove(subSequence);
         }
