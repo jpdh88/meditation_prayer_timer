@@ -1,50 +1,125 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * A command-line interface for creating Sequence Objects and running them
+ *
+ * @author Joseph Haley
  */
 public class InterfaceCommandLine {
-    /**
-     * Returns a visual representation of a Sequence object
-     * @param sequence The Sequence to be output
-     * @return Visual representation of the Sequence (in String form)
-     */
-    public static String drawSequence (Sequence sequence) {
-        String output = "";
-        /** ArrayList of SubSequence objects **/
-        ArrayList<SubSequence> subSequenceArrayList = new ArrayList<>(sequence.getSequenceArray());
-        /** Convert ArrayList into an Array **/
-        SubSequence[] subSequenceArray = subSequenceArrayList.toArray(new SubSequence[subSequenceArrayList.size()]);
+    // The default Sequence
+    private static Sequence userSequence = new Sequence();
+    // For user input with the keyboard
+    private static Scanner keybIn = new Scanner(System.in);
+    private static int userInput;
+    private static int userInput2;
 
-        for (SubSequence item: subSequenceArray) { // iterate through each member of the array
-            int sound = item.getSound(); // the SubSequence's sound
-            int duration = item.getDuration(); // the SubSequence's duration
-            String dashes = new String(new char[(duration / 60)]).replace("\0", "-");
+    public static void editSequence() {
+        boolean doneLvl2 = false;
+        while (!doneLvl2) {
+            System.out.println("+--------------------------------------------------");
+            System.out.println(userSequence.drawSequenceLine());
+            System.out.println("+--------------------------------------------------");
+            System.out.println("++ What would you like to do?");
+            System.out.println("\t1) Add a SubSequence to the end");
+            System.out.println("\t2) Add a SubSequence at a location");
+            System.out.println("\t3) Edit a SubSequence");
+            System.out.println("\t4) Swap two SubSequences");
+            System.out.println("\t5) Delete a SubSequence");
+            System.out.println("\t6) Change Primary Sound");
+            System.out.println("\t7) Change Secondary Sound");
+            System.out.println("\t0) Exit");
+            userInput = keybIn.nextInt();
 
-            switch(sound) {
+            switch (userInput) {
                 case 0:
-                    output += "O" + dashes;
+                    doneLvl2 = true;
                     break;
                 case 1:
-                    output += "o" + dashes;
-                    break;
-            }
+                    System.out.println("+++ How many seconds do you want it to be?");
+                    int duration = keybIn.nextInt();
 
+                    userSequence.addSubSequence(duration);
+                    System.out.println("[Sequence added.]");
+                    break;
+                case 2:
+                    boolean doneCase2 = false;
+                    while (!doneCase2) {
+                        System.out.println("+++ How many seconds do you want it to be?");
+                        int duration2 = keybIn.nextInt();
+                        System.out.println("+++ At what location?");
+                        int location = keybIn.nextInt();
+
+                        int numSubSequences = userSequence.getNumSubSequences();
+                        switch (location) {
+                            case 0:
+                                doneCase2 = true;
+                                break;
+                            case 1:
+                                System.out.println("[You can't add a sequence before the first one.]");
+                                break;
+                            default:
+                                if (location > numSubSequences) {
+                                    userSequence.addSubSequence(duration2);
+                                } else {
+                                    userSequence.addSubSequence(duration2, location - 1);
+                                }
+                                doneCase2 = true;
+                        }
+                    }
+                    break;
+                case 3:
+                    boolean doneCase3 = false;
+                    while (!doneCase3) {
+                        System.out.println("+++ What SubSequence would you like to edit?");
+                        int whichSubSequence = keybIn.nextInt();
+
+                        int numSubSequences = userSequence.getNumSubSequences();
+                        if (whichSubSequence == numSubSequences) {
+                            System.out.println("You can't edit the final sequence.");
+                        } else if (whichSubSequence == 0) {
+                            doneCase3 = true;
+                        } else if (whichSubSequence < 0 || whichSubSequence > numSubSequences) {
+                            System.out.println("Invalid choice.");
+                        } else {
+                            System.out.println("+++ What new duration do you want to give it?");
+                            int duration3 = keybIn.nextInt();
+
+                            userSequence.editSubSequence(whichSubSequence - 1, duration3);
+                            doneCase3 = true;
+                        }
+                    }
+            }
         }
-        return output;
     }
 
     /**
-     * Main method for testing this interface
+     * Main method for this interface
      * @param args
      */
     public static void main(String[] args) {
-        Sequence my_sequence = new Sequence();
-        my_sequence.addSubSequence(600);
-        my_sequence.addSubSequence(60);
-        my_sequence.addSubSequence(300);
-        //System.out.println(my_sequence);
+        // Sentinel variable
+        boolean doneProgram = false;
 
-        System.out.println(InterfaceCommandLine.drawSequence(my_sequence));
+        while (!doneProgram) {
+            System.out.println("+ What would you like to do? (Enter 0 at any time to exit)");
+            System.out.println("\t1) See my session");
+            System.out.println("\t2) Edit my session");
+            int userChoice = keybIn.nextInt();
+
+            switch (userChoice) {
+                case 0:
+                    doneProgram = true;
+                    break;
+                case 1:
+                    System.out.println(userSequence.drawSequenceLine());
+                    break;
+                case 2:
+                    editSequence();
+                default:
+                    System.out.println("[- Incorrect choice.]");
+            }
+        }
+
     }
 }
