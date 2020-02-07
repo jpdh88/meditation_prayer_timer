@@ -35,14 +35,14 @@ public class InterfaceCommandLine {
                 case 0:
                     doneLvl2 = true;
                     break;
-                case 1:
+                case 1: // Add at end
                     System.out.println("+++ How many seconds do you want it to be?");
                     int duration = keybIn.nextInt();
 
                     userSequence.addSubSequence(duration);
                     System.out.println("[Sequence added.]");
                     break;
-                case 2:
+                case 2: // Add at location
                     boolean doneCase2 = false;
                     while (!doneCase2) {
                         System.out.println("+++ How many seconds do you want it to be?");
@@ -68,7 +68,7 @@ public class InterfaceCommandLine {
                         }
                     }
                     break;
-                case 3:
+                case 3: // Edit
                     boolean doneCase3 = false;
                     while (!doneCase3) {
                         System.out.println("+++ What SubSequence would you like to edit?");
@@ -89,6 +89,22 @@ public class InterfaceCommandLine {
                             doneCase3 = true;
                         }
                     }
+                    break;
+                case 4: // Swap
+                    boolean doneCase4 = false;
+                    while (!doneCase4) {
+                        System.out.println("+++ Which are the two SubSequences you would like to swap?");
+                        int swapSequence1 = keybIn.nextInt();
+                        int swapSequence2 = keybIn.nextInt();
+
+                        if (swapSequence1 == 0 || swapSequence2 == 0) {
+                            doneCase4 = true;
+                        } else {
+                            userSequence.swapSubSequences(swapSequence1 - 1, swapSequence2 - 1);
+                            doneCase4 = true;
+                        }
+                    }
+                    break;
             }
         }
     }
