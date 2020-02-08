@@ -22,11 +22,11 @@ public class InterfaceCommandLine {
             System.out.println(userSequence.drawSequenceLine());
             System.out.println("+--------------------------------------------------");
             System.out.println("++ What would you like to do?");
-            System.out.println("\t1) Add a SubSequence to the end");
-            System.out.println("\t2) Add a SubSequence at a location");
-            System.out.println("\t3) Edit a SubSequence");
-            System.out.println("\t4) Swap two SubSequences");
-            System.out.println("\t5) Delete a SubSequence");
+            System.out.println("\t1) ADD a SubSequence to the end");
+            System.out.println("\t2) ADD a SubSequence at a location");
+            System.out.println("\t3) EDIT a SubSequence");
+            System.out.println("\t4) SWAP two SubSequences");
+            System.out.println("\t5) DELETE a SubSequence");
             System.out.println("\t6) Change Primary Sound");
             System.out.println("\t7) Change Secondary Sound");
             System.out.println("\t0) Exit");
@@ -37,7 +37,7 @@ public class InterfaceCommandLine {
                     doneLvl2 = true;
                     break;
                 case 1: // Add at end
-                    System.out.println("+++ How many seconds do you want it to be?");
+                    System.out.println("+++ ADD - How many seconds do you want it to be?");
                     int duration = keybIn.nextInt();
 
                     userSequence.addSubSequence(duration);
@@ -46,9 +46,9 @@ public class InterfaceCommandLine {
                 case 2: // Add at location
                     boolean doneCase2 = false;
                     while (!doneCase2) {
-                        System.out.println("+++ How many seconds do you want it to be?");
+                        System.out.println("+++ ADD - How many seconds do you want it to be?");
                         int duration2 = keybIn.nextInt();
-                        System.out.println("+++ At what location?");
+                        System.out.println("+++ ADD - At what location?");
                         int location = keybIn.nextInt();
 
                         int numSubSequences = userSequence.getNumSubSequences();
@@ -72,7 +72,7 @@ public class InterfaceCommandLine {
                 case 3: // Edit
                     boolean doneCase3 = false;
                     while (!doneCase3) {
-                        System.out.println("+++ What SubSequence would you like to edit?");
+                        System.out.println("+++ EDIT - What SubSequence would you like to edit?");
                         int whichSubSequence = keybIn.nextInt();
 
                         int numSubSequences = userSequence.getNumSubSequences();
@@ -83,7 +83,7 @@ public class InterfaceCommandLine {
                         } else if (whichSubSequence < 0 || whichSubSequence > numSubSequences) {
                             System.out.println("Invalid choice.");
                         } else {
-                            System.out.println("+++ What new duration do you want to give it?");
+                            System.out.println("+++ EDIT - What new duration do you want to give it?");
                             int duration3 = keybIn.nextInt();
 
                             userSequence.editSubSequence(whichSubSequence - 1, duration3);
@@ -94,7 +94,7 @@ public class InterfaceCommandLine {
                 case 4: // Swap
                     boolean doneCase4 = false;
                     while (!doneCase4) {
-                        System.out.println("+++ Which are the two SubSequences you would like to swap?");
+                        System.out.println("+++ SWAP - Which are the two SubSequences you would like to swap?");
                         int swapSequence1 = keybIn.nextInt();
                         int swapSequence2 = keybIn.nextInt();
 
@@ -106,6 +106,23 @@ public class InterfaceCommandLine {
                         }
                     }
                     break;
+                case 5: // DELETE
+                    boolean doneCase5 = false;
+                    while (!doneCase5) {
+                        System.out.println("+++ DELETE - Which SubSequence would you like to delete?");
+                        int whichSubSequence = keybIn.nextInt();
+
+                        if (whichSubSequence == 0){
+                            doneCase5 = true;
+                        }  else if (whichSubSequence > userSequence.getNumSubSequences()) {
+                            System.out.println("Sequence Class Error: Invalid index.");
+                        } else if (whichSubSequence - 1 == 0 || whichSubSequence == userSequence.getNumSubSequences()){
+                            System.out.println("Sequence Class Error: You can't remove the first or last sequence.");
+                        } else {
+                            userSequence.deleteSubSequence(whichSubSequence - 1);
+                            doneCase5 = true;
+                        }
+                    }
             }
         }
     }
