@@ -67,8 +67,8 @@ public class InterfaceCommandLine {
             System.out.println("\t3) EDIT a SubSequence");
             System.out.println("\t4) SWAP two SubSequences");
             System.out.println("\t5) DELETE a SubSequence");
-            System.out.println("\t6) Change Primary Sound");
-            System.out.println("\t7) Change Secondary Sound");
+            System.out.println("\t6) Change Main Sounds");
+            System.out.println("\t7) Change Secondary Sounds");
             System.out.println("\t0) Exit");
             int userInput = keybIn.nextInt();
 
@@ -194,6 +194,9 @@ public class InterfaceCommandLine {
                             }
                     }
                     break;
+//                case 6:
+//                    System.out.println("\tCurrent sound: " + userSequence.get);
+//                    break;
             }
         }
     }

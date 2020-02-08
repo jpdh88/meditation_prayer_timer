@@ -14,6 +14,10 @@ public class Sequence {
     // VARIABLES
     /** Array of SubSequences **/
     private ArrayList<SubSequence> subSequenceArray = new ArrayList<>();
+    /** Sound Object for first and last SubSequences (the "Main" SubSequences) **/
+    private Sound mainSound;
+    /** Sound Object for intervening SubSequences **/
+    private Sound secondarySound;
 
     // METHODS
     // *** Constructors
@@ -23,9 +27,51 @@ public class Sequence {
     public Sequence() {
         subSequenceArray.add( new SubSequence(1800, true));
         subSequenceArray.add( new SubSequence(0, false));
+        mainSound = new Sound(true);
+        secondarySound = new Sound(false);
     }
 
     // *** Values methods
+
+    /**
+     * Gets the sound associated with the Main SubSequences (the first and last SubSequences)
+     * @return The name of the sound that will be played
+     */
+    public String getMainSound() {
+        return mainSound.getSoundName();
+    }
+
+    /**
+     * Sets the sound name associated with the Main SubSequences
+     * @param soundName The name of the sound (must be in the Sound.soundList)
+     */
+    public void setMainSound(String soundName) {
+        mainSound.setSound(soundName);
+    }
+
+    /**
+     * Gets the sound associated with the Secondary SubSequences
+     * @return The name of the sound that will be played
+     */
+    public String getSecondarySound() {
+        return secondarySound.getSoundName();
+    }
+
+    /**
+     * Sets the sound name associated with the Secondary SubSequences
+     * @param soundName The name of the sound (must be in the Sound.soundList)
+     */
+    public void setSecondarySound(String soundName) {
+        secondarySound.setSound(soundName);
+    }
+
+    /**
+     * Gets the list of available sounds
+     * @return A list of sound names
+     */
+    public String[] getSoundList() {
+        return null;
+    }
 
     /**
      * Get the SubSequenceArray
@@ -129,12 +175,16 @@ public class Sequence {
         SubSequence[] subSequenceArray = subSequenceArrayList.toArray(new SubSequence[subSequenceArrayList.size()]);
 
         int counter = 1;
-        for (SubSequence item: subSequenceArray) { // iterate through each member of the array
-            int duration = item.getDuration(); // the SubSequence's duration
+        for (SubSequence subSequence: subSequenceArray) { // iterate through each member of the array
+            int duration = subSequence.getDuration(); // the SubSequence's duration
             String dashes = new String(new char[(duration / 60)]).replace("\0", "-");
             String spaces = new String(new char[(duration / 60)]).replace("\0", " ");
 
-            line1 += "O" + dashes;
+            if (subSequence.getIsFirstOrLast()) {
+                line1 += "O" + dashes;
+            } else{
+                line1 += "o" + dashes;
+            }
             line2 += counter + spaces;
 
             counter++;

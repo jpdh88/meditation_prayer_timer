@@ -55,7 +55,7 @@ public class Sound {
 
     /**
      * Constructor method for when defaults are set up
-     * @param isFirstOrLast
+     * @param isFirstOrLast Whether the Sound object will be associated with a Main or a Secondary SubSequence
      */
     public Sound(boolean isFirstOrLast) {
         populateSoundList();

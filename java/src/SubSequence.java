@@ -8,26 +8,15 @@ public class SubSequence {
     private boolean isFirstOrLast;
     /** Duration of the SubSequence */
     private int duration; // in seconds
-    /** The Sound object associated w/ the SubSequence */
-    Sound sound;
 
     // METHODS
     // *** Constructors
     /**
      * Constructor: Used to create SubSequences
      */
-    public SubSequence(int duration, String soundName) {
-        this.duration = duration;
-        this.sound = new Sound(soundName);
-    }
     public SubSequence(int duration, boolean isFirstOrLast) {
         this.isFirstOrLast = isFirstOrLast;
         this.duration = duration;
-        if (isFirstOrLast == true) { // is a first or last SubSequence
-            this.sound = new Sound(true);
-        } else { // SubSequence is an intervening subsequence
-                this.sound = new Sound(false);
-        }
     }
 
     // *** Variable methods
@@ -51,28 +40,26 @@ public class SubSequence {
     }
 
     /**
-     * Set the sound to be used at the beginning of the sequence
-     *
-     * @param soundName The name of the sound (must correspond to a sound in the Sound class)
+     * Sets whether this SubSequence is a first or last / Main SubSequence
+     * @param isFirstOrLast whether this SubSequence is a Main SubSequence or not
      */
-    public void setSound(String soundName) {
-        sound.setSound(soundName);
+    public void setIsFirstOrLast(boolean isFirstOrLast) {
+        this.isFirstOrLast = isFirstOrLast;
     }
 
     /**
-     * Get the sound to be used at the beginning of the sequence
-     *
-     * @return The name of the sound
+     * Gets whether this SubSequence is a first or last / Main SubSequence
+     * @return whether this SubSequence is a Main SubSequence
      */
-    public String getSound() {
-        return sound.getSoundName();
+    public boolean getIsFirstOrLast() {
+        return isFirstOrLast;
     }
 
     // *** Utility methods
     @Override
     public String toString() {
         return  "dur: " + String.format("%6d", duration) +
-                "\t\tsound: " + sound;
+                "isFirstOrLast:  " + isFirstOrLast;
     }
 
     // MAIN METHOD FOR TESTING
@@ -83,7 +70,7 @@ public class SubSequence {
         SubSequence ss2 = new SubSequence(50, false);
         System.out.println(ss2);
 
-        SubSequence ss3 = new SubSequence(500, "Birds");
+        SubSequence ss3 = new SubSequence(500, false);
         System.out.println(ss3);
     }
 }
