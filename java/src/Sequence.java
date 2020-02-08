@@ -103,8 +103,10 @@ public class Sequence {
      * @param subSequence The index of the Subsequence in subSequenceArray that is being being removed
      */
     public void removeSubSequence(int subSequence) {
-        if (subSequence >= subSequenceArray.size() - 1) {
+        if (subSequence >= subSequenceArray.size()) {
             System.out.println("Sequence Class Error: Invalid index.");
+        } else if (subSequence = 0 || (subSequence == subSequenceArray.size() - 1){
+            System.out.println("Sequence Class Error: You can't remove the first or last sequence.");
         } else {
             subSequenceArray.remove(subSequence);
         }
