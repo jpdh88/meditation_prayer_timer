@@ -37,11 +37,18 @@ public class InterfaceCommandLine {
                     doneLvl2 = true;
                     break;
                 case 1: // Add at end
-                    System.out.println("+++ ADD - How many seconds do you want it to be?");
-                    int duration = keybIn.nextInt();
+                    boolean doneCase1 = false;
+                    while (!doneCase1) {
+                        System.out.println("+++ ADD - How many seconds do you want it to be?");
+                        int duration = keybIn.nextInt();
 
-                    userSequence.addSubSequence(duration);
-                    System.out.println("[Sequence added.]");
+                        if (duration < 0) {
+                            System.out.println("x[Duration must be 0 or greater.]");
+                        } else {
+                            userSequence.addSubSequence(duration);
+                            doneCase1 = true;
+                        }
+                    }
                     break;
                 case 2: // Add at location
                     boolean doneCase2 = false;
@@ -57,7 +64,7 @@ public class InterfaceCommandLine {
                                 doneCase2 = true;
                                 break;
                             case 1:
-                                System.out.println("[You can't add a sequence before the first one.]");
+                                System.out.println("x[You can't add a sequence before the first one.]");
                                 break;
                             default:
                                 if (location > numSubSequences) {
@@ -77,11 +84,11 @@ public class InterfaceCommandLine {
 
                         int numSubSequences = userSequence.getNumSubSequences();
                         if (whichSubSequence == numSubSequences) {
-                            System.out.println("You can't edit the final sequence.");
+                            System.out.println("x[You can't edit the final sequence.]");
                         } else if (whichSubSequence == 0) {
                             doneCase3 = true;
                         } else if (whichSubSequence < 0 || whichSubSequence > numSubSequences) {
-                            System.out.println("Invalid choice.");
+                            System.out.println("x[Invalid choice.]");
                         } else {
                             System.out.println("+++ EDIT - What new duration do you want to give it?");
                             int duration3 = keybIn.nextInt();
@@ -115,9 +122,9 @@ public class InterfaceCommandLine {
                         if (whichSubSequence == 0){
                             doneCase5 = true;
                         }  else if (whichSubSequence > userSequence.getNumSubSequences()) {
-                            System.out.println("Sequence Class Error: Invalid index.");
+                            System.out.println("x[Sequence Class Error: Invalid index.]");
                         } else if (whichSubSequence - 1 == 0 || whichSubSequence == userSequence.getNumSubSequences()){
-                            System.out.println("Sequence Class Error: You can't remove the first or last sequence.");
+                            System.out.println("x[Sequence Class Error: You can't remove the first or last sequence.]");
                         } else {
                             userSequence.deleteSubSequence(whichSubSequence - 1);
                             doneCase5 = true;
