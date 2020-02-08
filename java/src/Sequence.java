@@ -60,7 +60,7 @@ public class Sequence {
         if (duration >= 0) {
             this.addSubSequence(duration, subSequenceArray.size() - 1);
         } else {
-            System.out.println("Sequence Class Error: Duration must be a positive integer");
+            System.out.println("Sequence Class Error: Duration must be a positive integer.");
         }
     }
 
@@ -71,10 +71,12 @@ public class Sequence {
      * @param newDuration The new duration of the SubSequence
      */
     public void editSubSequence (int index, int newDuration) {
-        if (index < subSequenceArray.size() - 1) {
-            subSequenceArray.get(index).setDuration(newDuration);
+        if (index == 0 || index == subSequenceArray.size() - 1) {
+            System.out.println("Sequence Class Error: You can't edit the first or last SubSequence.");
+        } else if (index < 0 || index >= subSequenceArray.size()){
+            System.out.println("Sequence Class Error: Index out of range.");
         } else {
-            System.out.println("Sequence Class Error: You can't edit that SubSequence");
+            subSequenceArray.get(index).setDuration(newDuration);
         }
     }
 
@@ -88,10 +90,10 @@ public class Sequence {
                 index1 == subSequenceArray.size() - 1 ||
                 index2 == 0 ||
                 index2 == subSequenceArray.size() - 1 ) {
-            System.out.println("Sequence Class Error: You can't swap those SubSequences");
+            System.out.println("Sequence Class Error: You can't use swap with the first or last SubSequence.");
         } else if ( index1 >= subSequenceArray.size() ||
                     index2 >= subSequenceArray.size() ) {
-            System.out.println("Sequence Class Error: One or more indexes are out of range");
+            System.out.println("Sequence Class Error: One or more indexes are out of range.");
         } else {
             Collections.swap(subSequenceArray, index1, index2);
         }
@@ -102,11 +104,11 @@ public class Sequence {
      *  - The first or last SubSequence cannot be deleted
      * @param subSequence The index of the Subsequence in subSequenceArray that is being being removed
      */
-    public void removeSubSequence(int subSequence) {
+    public void deleteSubSequence(int subSequence) {
         if (subSequence >= subSequenceArray.size()) {
-            System.out.println("Sequence Class Error: Invalid index.");
-        } else if (subSequence = 0 || (subSequence == subSequenceArray.size() - 1){
-            System.out.println("Sequence Class Error: You can't remove the first or last sequence.");
+            System.out.println("Sequence Class Error: Index out of range.");
+        } else if (subSequence == 0 || (subSequence == subSequenceArray.size() - 1)){
+            System.out.println("Sequence Class Error: You can't remove the first or last SubSequence.");
         } else {
             subSequenceArray.remove(subSequence);
         }
