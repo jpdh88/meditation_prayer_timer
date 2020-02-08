@@ -4,43 +4,30 @@
  */
 public class SubSequence {
     // VARIABLES
-    /**
-     * Duration of the sequence
-     **/
+    /** Whether the SubSequence is first or last ( = True), or not ( = False) */
+    private boolean isFirstOrLast;
+    /** Duration of the SubSequence */
     private int duration; // in seconds
-    /**
-     * The sound associated w/ the SubSequence
-     */
-    private int sound; // represents index of array of file paths
-    /**
-     * Sounds that can be associated w/ the SubSequence
-     **/
-    String[] soundList = {"Primary sound", "Secondary sound", "other sound", "another sound"};
+    /** The Sound object associated w/ the SubSequence */
+    Sound sound;
 
     // METHODS
     // *** Constructors
     /**
-     * Constructor: Used to create the first or last SubSequence
+     * Constructor: Used to create SubSequences
      */
-    public SubSequence(String firstOrLast) {
-        switch (firstOrLast) {
-            case "first":
-               duration = 1800;
-               sound = 0; // a default SubSequence has a length of 30 minutes
-               break;
-            case "last":
-                duration = 0;
-                sound = 0;
-                break;
-        }
-    }
-
-    /**
-     * Constructor: Used to create intervening SubSequences
-     */
-    public SubSequence(int duration) {
+    public SubSequence(int duration, String soundName) {
         this.duration = duration;
-        sound = 1;
+        this.sound = new Sound(soundName);
+    }
+    public SubSequence(int duration, boolean isFirstOrLast) {
+        this.isFirstOrLast = isFirstOrLast;
+        this.duration = duration;
+        if (isFirstOrLast == true) { // is a first or last SubSequence
+            this.sound = new Sound(true);
+        } else { // SubSequence is an intervening subsequence
+                this.sound = new Sound(false);
+        }
     }
 
     // *** Variable methods
@@ -48,7 +35,7 @@ public class SubSequence {
     /**
      * Set the duration
      *
-     * @param duration Duration of the sound in seconds
+     * @param duration Duration of the sequence in seconds
      */
     public void setDuration(int duration) {
         this.duration = duration;
@@ -66,38 +53,37 @@ public class SubSequence {
     /**
      * Set the sound to be used at the beginning of the sequence
      *
-     * @param sound Full path to the sound file
+     * @param soundName The name of the sound (must correspond to a sound in the Sound class)
      */
-    public void setSound(int sound) {
-        this.sound = sound;
+    public void setSound(String soundName) {
+        sound.setSound(soundName);
     }
 
     /**
      * Get the sound to be used at the beginning of the sequence
      *
-     * @return Full path to the sound file
+     * @return The name of the sound
      */
-    public int getSound() {
-        return sound;
+    public String getSound() {
+        return sound.getSoundName();
     }
 
     // *** Utility methods
     @Override
     public String toString() {
         return  "dur: " + String.format("%6d", duration) +
-                "\t\tsound: " + sound +
-                "\t\t(soundPath: " + soundList[sound] + ")";
+                "\t\tsound: " + sound;
     }
 
     // MAIN METHOD FOR TESTING
     public static void main(String[] args) {
-        SubSequence ss1 = new SubSequence("first");
+        SubSequence ss1 = new SubSequence(1800, true);
         System.out.println(ss1);
 
-        SubSequence ss2 = new SubSequence("last");
+        SubSequence ss2 = new SubSequence(50, false);
         System.out.println(ss2);
 
-        SubSequence ss3 = new SubSequence(50);
+        SubSequence ss3 = new SubSequence(500, "Birds");
         System.out.println(ss3);
     }
 }

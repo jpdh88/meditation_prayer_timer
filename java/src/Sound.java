@@ -28,13 +28,13 @@ public class Sound {
 
     // METHODS
     // *** Constructors
+
     /**
-     * Constructor method
-     * @param soundName the name of the sound chosen for this Sound object (must be one of the keys in the soundList Map
+     * Helper method for Constructors
      */
-    public Sound(String soundName) {
-        soundList.put("Meditation Bell 1", soundsDir + "meditation_bell_low.wav");
-        soundList.put("Meditation Bell 2", soundsDir + "meditation_bell_high.wav");
+    private void populateSoundList() {
+        soundList.put("Default Low", soundsDir + "meditation_bell_low.wav");
+        soundList.put("Default High", soundsDir + "meditation_bell_high.wav");
         soundList.put("Church Bell 1", soundsDir + "church_bell_low.wav");
         soundList.put("Church Bell 2", soundsDir + "church_bell_high.wav");
         soundList.put("Church Bell 3", soundsDir + "church_bell_low_2.wav");
@@ -43,12 +43,32 @@ public class Sound {
         soundList.put("Seashore", soundsDir + "seashore.wav");
         soundList.put("Cafe", soundsDir + "cafe.wav");
         soundList.put("Gibberish", soundsDir + "gibberish.wav");
+    }
+    /**
+     * Constructor method when a soundName is passed to it
+     * @param soundName the name of the sound chosen for this Sound object (must be one of the keys in the soundList Map
+     */
+    public Sound(String soundName) {
+        populateSoundList();
         setSound(soundName);
+    }
+
+    /**
+     * Constructor method for when defaults are set up
+     * @param isFirstOrLast
+     */
+    public Sound(boolean isFirstOrLast) {
+        populateSoundList();
+        if (isFirstOrLast == true) { // is a first or last SubSequence
+            setSound("Default Low");
+        } else { // is an intervening SubSequence
+            setSound("Default High");
+        }
     }
 
     // *** Values Methods
     /**
-     * Sets the chosen sound: calls
+     * Sets the chosen sound
      */
     public void setSound(String soundName) {
         if (soundList.containsKey(soundName)) {
@@ -119,6 +139,12 @@ public class Sound {
         double soundDuration = (frames+0.0) / soundStreamFormat.getFrameRate();
 
         return soundDuration;
+    }
+
+    // *** Utility Methods
+    @Override
+    public String toString() {
+        return "Sound Object: " + soundsDir + soundName;
     }
 
     /**

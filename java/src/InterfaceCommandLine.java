@@ -91,14 +91,23 @@ public class InterfaceCommandLine {
                     }
                     break;
                 case 2: // Add at location
-                    boolean doneCase2 = false;
+                    boolean doneCase2 = false; // sentinel value
                     while (!doneCase2) {
+                        int numSubSequences = userSequence.getNumSubSequences();
+
                         System.out.println(prompt("ADD - How many seconds do you want it to be?", 3));
                         int duration2 = keybIn.nextInt();
-                        System.out.println(prompt("ADD - At what location?", 3));
-                        int location = keybIn.nextInt();
 
-                        int numSubSequences = userSequence.getNumSubSequences();
+                        // If there are only two SubSequences in the Sequence, there is no need to ask for a location
+                        int location;
+                        if (numSubSequences == 2) {
+                            location = 2; //
+                        } else {
+                            System.out.println(prompt("ADD - At what location?", 3));
+                            location = keybIn.nextInt();
+                        }
+
+                        // Evaluate the inputted location
                         switch (location) {
                             case 0:
                                 doneCase2 = true;

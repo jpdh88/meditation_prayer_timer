@@ -21,8 +21,8 @@ public class Sequence {
      * Empty constructor: Creates the default Sequence (just first and last SubSequences)
      */
     public Sequence() {
-        subSequenceArray.add( new SubSequence("first"));
-        subSequenceArray.add( new SubSequence("last"));
+        subSequenceArray.add( new SubSequence(1800, true));
+        subSequenceArray.add( new SubSequence(0, false));
     }
 
     // *** Values methods
@@ -50,7 +50,7 @@ public class Sequence {
      * @param duration The length of the new SubSequence
      */
     public void addSubSequence(int duration, int index) {
-        subSequenceArray.add(index, new SubSequence(duration));
+        subSequenceArray.add(index, new SubSequence(duration, false));
     }
     /**
      * Creates a new SubSequence and inserts it into the second-to-last spot
@@ -130,21 +130,13 @@ public class Sequence {
 
         int counter = 1;
         for (SubSequence item: subSequenceArray) { // iterate through each member of the array
-            int sound = item.getSound(); // the SubSequence's sound
             int duration = item.getDuration(); // the SubSequence's duration
             String dashes = new String(new char[(duration / 60)]).replace("\0", "-");
             String spaces = new String(new char[(duration / 60)]).replace("\0", " ");
 
-            switch(sound) {
-                case 0:
-                    line1 += "O" + dashes;
-                    line2 += counter + spaces;
-                    break;
-                case 1:
-                    line1 += "o" + dashes;
-                    line2 += counter + spaces;
-                    break;
-            }
+            line1 += "O" + dashes;
+            line2 += counter + spaces;
+
             counter++;
 
         }
