@@ -105,7 +105,7 @@ public class Sequence {
      * @param subSequence The index of the Subsequence in subSequenceArray that is being being removed
      */
     public void deleteSubSequence(int subSequence) {
-        if (subSequence >= subSequenceArray.size()) {
+        if (subSequence < 0 || subSequence >= subSequenceArray.size()) {
             System.out.println("Sequence Class Error: Index out of range.");
         } else if (subSequence == 0 || (subSequence == subSequenceArray.size() - 1)){
             System.out.println("Sequence Class Error: You can't remove the first or last SubSequence.");
