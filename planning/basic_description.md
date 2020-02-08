@@ -1,3 +1,4 @@
+# Meditation and Prayer Timer
 A very simple app to time meditation and prayer sessions, particularly sessions
 that might involve several stages where each equire a tone or bell.
 
@@ -26,3 +27,13 @@ A Sequence will be composed of SubSequences.
 A SubSequence is composed of a sound and a duration. A sound is played and the duration timer begins.
 The first SubSequence in the sequence must use primary sound; the last Subsequence in the sequence must use Primary sound and be of duration 0 (really, duration of Primary sound)
 SubSequences in between the first and last SubSequences use Secondary sound and have a duration > 0.
+
+## Glossary/More Info.
+A meditation/prayer session is represented by a Sequence.
+Sequence    = a series of SubSequences
+            = two Sound Objects (one for Main SubSequences and one for Secondary SubSequences)
+SubSequence = a duration
+            = a "type":
+                - a first or last SubSequences (a "Main" SubSequence)
+                - an intervening SubSequence
+                + there are two types b/c each type has a different sound associated w/ it
