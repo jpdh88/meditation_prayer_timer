@@ -52,6 +52,53 @@ public class InterfaceCommandLine {
     }
 
     /**
+     * Method for helping with selection of Main or Secondary sound (using this saves having to duplicate the loop)
+     * @param soundType Either "Main Sound" or "Secondary Sound"
+     * @return The name of the sound chosen
+     */
+    public static String selectSound(String soundType) {
+        String[] soundList = userSequence.getSoundList();
+
+        System.out.println("\tSound List:");
+
+        // Print list of sounds
+        int soundNum = 1; // Give each array item a number
+        for (String soundName: soundList) {
+            if (soundName == userSequence.getMainSound() && soundName == userSequence.getSecondarySound()) {
+                System.out.println("\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Main and Secondary Sound)");
+            } else if (soundName == userSequence.getMainSound()) {
+                System.out.println("\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Main Sound)");
+            } else if (soundName == userSequence.getSecondarySound()) {
+                System.out.println("\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Secondary Sound)");
+            } else {
+                System.out.println("\t" + String.format("%2d", soundNum) + ") " + soundName);
+            }
+            soundNum++;
+        }
+        System.out.println("\t---");
+        System.out.println("\t 0) Exit");
+
+        // Selection loop
+        String soundName = userSequence.getMainSound(); // initialize the choice with the current soundName
+        boolean doneCase6 = false;
+        while (!doneCase6) {
+            System.out.println(prompt("Which sound do you want as the " + soundType + "?", 3));
+            int soundChoice = keybIn.nextInt();
+
+            if (soundChoice == 0) { // exit without making a choice
+                doneCase6 = true;
+            } else if (soundChoice > 0 && soundChoice <= soundList.length) {
+                soundName = soundList[soundChoice - 1];
+                doneCase6 = true;
+            } else {
+                System.out.println(errorMsg("That is not a valid option."));
+            }
+        }
+
+        return soundName;
+    }
+
+    /**
      * Method for editing a meditation session (i.e. a Sequence object)
      * Presents and controls the command line user interface
      */
@@ -69,6 +116,8 @@ public class InterfaceCommandLine {
             System.out.println("\t5) DELETE a SubSequence");
             System.out.println("\t6) Change Main Sound");
             System.out.println("\t7) Change Secondary Sound");
+            System.out.println("\t8) Play sounds");
+            System.out.println("\t---");
             System.out.println("\t0) Exit");
             int userInput = keybIn.nextInt();
 
@@ -195,21 +244,13 @@ public class InterfaceCommandLine {
                     }
                     break;
                 case 6:
-                    System.out.println(prompt("Please choose from: ", 3));
-
-                    // iterate through each member of the soundList array
-                    int soundNum = 1;
-
-                    String[] soundList = userSequence.getSoundList();
-
-                    System.out.println("\tCurrent Main sound: " + userSequence.getMainSound());
-
-                    for (String soundName: soundList) {
-                        System.out.println("\t\t" + soundNum + ") " + soundName);
-                        soundNum++;
-                    }
-                    System.out.println("\t\t0) Exit");
+                    userSequence.setMainSound(selectSound(("Main Sound")));
                     break;
+                case 7:
+                    userSequence.setMainSound(selectSound(("Secondary Sound")));
+                    break;
+                default:
+                    System.out.println(errorMsg("That's not a valid choice."));
             }
         }
     }
@@ -223,9 +264,11 @@ public class InterfaceCommandLine {
         boolean doneProgram = false;
 
         while (!doneProgram) {
-            System.out.println(prompt("What would you like to do? (Enter 0 at any time to exit)", 1));
+            System.out.println(prompt("What would you like to do?", 1));
             System.out.println("\t1) See my session");
             System.out.println("\t2) Edit my session");
+            System.out.println("\t---");
+            System.out.println("\t0) Exit");
             int userChoice = keybIn.nextInt();
 
             switch (userChoice) {
