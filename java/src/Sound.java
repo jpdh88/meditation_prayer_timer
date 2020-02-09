@@ -1,6 +1,5 @@
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.*;
+import javax.swing.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -148,9 +147,59 @@ public class Sound {
     }
 
     // *** Utility Methods
+
+    /**
+     * Returns a String with information about the Sound object
+     * @return Information about the Sound object
+     */
     @Override
     public String toString() {
         return "Sound Object: " + soundsDir + soundName;
+    }
+
+    /**
+     * Plays the sound clip associated w/ the Sound object
+     *  - From: https://stackoverflow.com/questions/26305/how-can-i-play-sound-in-java
+     *  - From: https://www3.ntu.edu.sg/home/ehchua/programming/java/J8c_PlayingSound.html
+     *  - From: https://stackoverflow.com/tags/javasound/info
+     *  - From: https://stackoverflow.com/questions/577724/trouble-playing-wav-in-java/577926#577926
+     */
+    public synchronized void playSound() {
+        try {
+            class AudioListener implements LineListener {
+                private boolean done = false;
+
+                @Override
+                public synchronized void update(LineEvent event) {
+                    LineEvent.Type eventType = event.getType();
+                    if (eventType == LineEvent.Type.STOP || eventType == LineEvent.Type.CLOSE) {
+                        done = true;
+                        notifyAll();
+                    }
+                }
+
+                public synchronized void waitUntilDone() throws InterruptedException {
+                    while (!done) {
+                        wait();
+                    }
+                }
+            }
+            AudioListener listener = new AudioListener();
+            try {
+                Clip clip = AudioSystem.getClip();
+                clip.open(soundStream);
+                try {
+                    clip.start();
+                    listener.waitUntilDone();
+                } finally {
+                    clip.close();
+                }
+            } finally {
+                soundStream.close();
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     /**
@@ -159,10 +208,12 @@ public class Sound {
      */
     public static void main(String[] args) {
         System.out.println("---------------TESTING----------------");
-        Sound mySound = new Sound("Birds");
+        Sound mySound = new Sound("Meditation Bell 1");
         System.out.println(mySound.getSoundList());
         System.out.println(mySound.getSoundName().toString());
         System.out.println(mySound.getSoundStream());
         System.out.println(mySound.getSoundDuration());
+        AudioInputStream mystream = mySound.getSoundStream();
+        mySound.playSound();
     }
 }
