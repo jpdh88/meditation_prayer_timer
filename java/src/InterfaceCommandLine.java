@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * A command-line interface for creating Sequence Objects and running them
@@ -67,8 +68,8 @@ public class InterfaceCommandLine {
             System.out.println("\t3) EDIT a SubSequence");
             System.out.println("\t4) SWAP two SubSequences");
             System.out.println("\t5) DELETE a SubSequence");
-            System.out.println("\t6) Change Main Sounds");
-            System.out.println("\t7) Change Secondary Sounds");
+            System.out.println("\t6) Change Main Sound");
+            System.out.println("\t7) Change Secondary Sound");
             System.out.println("\t0) Exit");
             int userInput = keybIn.nextInt();
 
@@ -194,9 +195,19 @@ public class InterfaceCommandLine {
                             }
                     }
                     break;
-//                case 6:
-//                    System.out.println("\tCurrent sound: " + userSequence.get);
-//                    break;
+                case 6:
+                    System.out.println("\tCurrent Main sound: " + userSequence.getMainSound());
+                    System.out.println("\tPlease choose from: ");
+
+                    // iterate through each member of the soundList array
+                    int soundNum = 1;
+                    Set<String> soundList = userSequence.getSoundList();
+                    for (String soundName: soundList) {
+                        System.out.println("\t\t" + soundNum + ") " + soundName);
+                        soundNum++;
+                    }
+                    System.out.println("\t\t0) Exit");
+                    break;
             }
         }
     }

@@ -155,7 +155,7 @@ public class Sound {
         System.out.println("---------------TESTING----------------");
         Sound mySound = new Sound("Birds");
         System.out.println(mySound.getSoundList());
-        System.out.println(mySound.getSoundName());
+        System.out.println(mySound.getSoundName().toString());
         System.out.println(mySound.getSoundStream());
         System.out.println(mySound.getSoundDuration());
     }

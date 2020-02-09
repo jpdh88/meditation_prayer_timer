@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * Represents a Sequence object. This object will be used to set up a meditation session.
@@ -67,10 +68,10 @@ public class Sequence {
 
     /**
      * Gets the list of available sounds
-     * @return A list of sound names
+     * @return A Set object of sound names
      */
-    public String[] getSoundList() {
-        return null;
+    public Set getSoundList() {
+        return mainSound.getSoundList();
     }
 
     /**
