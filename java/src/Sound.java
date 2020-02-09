@@ -2,6 +2,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -129,6 +130,7 @@ public class Sound {
     public String[] getSoundList() {
         Set<String> soundListSet = soundList.keySet();
         String[] soundListArray = new String[soundListSet.size()];
+        Arrays.sort(soundListArray);
 
         return soundListSet.toArray(soundListArray);
     }

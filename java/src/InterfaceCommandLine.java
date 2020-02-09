@@ -1,5 +1,4 @@
 import java.util.Scanner;
-import java.util.Set;
 
 /**
  * A command-line interface for creating Sequence Objects and running them
