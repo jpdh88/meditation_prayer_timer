@@ -34,8 +34,8 @@ public class Sound {
      * Helper method for Constructors
      */
     private void populateSoundList() {
-        soundList.put("Default Low", soundsDir + "meditation_bell_low.wav");
-        soundList.put("Default High", soundsDir + "meditation_bell_high.wav");
+        soundList.put("Meditation Bell 1", soundsDir + "meditation_bell_low.wav");
+        soundList.put("Meditation Bell 2", soundsDir + "meditation_bell_high.wav");
         soundList.put("Church Bell 1", soundsDir + "church_bell_low.wav");
         soundList.put("Church Bell 2", soundsDir + "church_bell_high.wav");
         soundList.put("Church Bell 3", soundsDir + "church_bell_low_2.wav");
@@ -61,9 +61,9 @@ public class Sound {
     public Sound(boolean isFirstOrLast) {
         populateSoundList();
         if (isFirstOrLast == true) { // is a first or last SubSequence
-            setSound("Default Low");
+            setSound("Meditation Bell 1");
         } else { // is an intervening SubSequence
-            setSound("Default High");
+            setSound("Meditation Bell 2");
         }
     }
 
