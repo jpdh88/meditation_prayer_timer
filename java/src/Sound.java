@@ -130,9 +130,10 @@ public class Sound {
     public String[] getSoundList() {
         Set<String> soundListSet = soundList.keySet();
         String[] soundListArray = new String[soundListSet.size()];
+        soundListSet.toArray(soundListArray);
         Arrays.sort(soundListArray);
 
-        return soundListSet.toArray(soundListArray);
+        return soundListArray;
     }
 
     /**
