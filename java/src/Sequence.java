@@ -67,6 +67,17 @@ public class Sequence {
     }
 
     /**
+     * Gets the full path associated with a sound's name from the master soundList
+     * @param soundName The name of the sound
+     * @return the full path associated with the sound's name
+     */
+    public String getPathFromSoundList(String soundName) {
+        // we could get this from either the mainSound or the secondary Sound
+        // all we want is the full path of a sound, which is always the same for every instance of a Sound object
+        return mainSound.getPathFromSoundList(soundName);
+    }
+
+    /**
      * Gets the list of available sounds
      * @return A Set object of sound names
      */

@@ -103,16 +103,32 @@ public class Sound {
     }
     /**
      * Sets the soundStream according to the soundName given
-     * @param soundName
+     * @param soundName The name of the sound (from the soundList)
      */
     private void setSoundStream(String soundName) throws Exception {
         try {
-            File soundFile = new File(soundList.get(soundName));
-            soundStream = AudioSystem.getAudioInputStream(soundFile);
+            soundStream = Sound.createSoundStream(soundList.get(soundName));
             soundStreamFormat = soundStream.getFormat();
+        } catch (Exception e) {
+            System.out.println("Sound Class Error: " + e);
+        }
+    }
+
+    /**
+     * Creates an AudioInputStream from a file path
+     * @param soundName The path of the sound (found in the soundList)
+     * @return An AudioInputStream for the sound path passed to the function
+     * @throws Exception
+     */
+    public static AudioInputStream createSoundStream(String soundName) throws Exception {
+        AudioInputStream soundStream = null;
+        try {
+            File soundFile = new File(soundName);
+            soundStream = AudioSystem.getAudioInputStream(soundFile);
         } catch (Exception e) {
             System.out.println("Sound Class Exception in setSoundStream method\n\t" + e);
         }
+        return soundStream;
     }
 
     /**
@@ -146,6 +162,15 @@ public class Sound {
         return soundDuration;
     }
 
+    /**
+     * Gets the full path associated with a sound's name from the soundList
+     * @param soundName The name of the sound
+     * @return the full path associated with the sound's name
+     */
+    public String getPathFromSoundList(String soundName) {
+        return soundList.get(soundName);
+    }
+
     // *** Utility Methods
 
     /**
@@ -158,13 +183,13 @@ public class Sound {
     }
 
     /**
-     * Plays the sound clip associated w/ the Sound object
+     * Plays an AudioInputStream (sound file)
      *  - From: https://stackoverflow.com/questions/26305/how-can-i-play-sound-in-java
      *  - From: https://www3.ntu.edu.sg/home/ehchua/programming/java/J8c_PlayingSound.html
      *  - From: https://stackoverflow.com/tags/javasound/info
      *  - From: https://stackoverflow.com/questions/577724/trouble-playing-wav-in-java/577926#577926
      */
-    public synchronized void playSound() {
+    public static synchronized void playSound(AudioInputStream soundStream) {
         try {
             class AudioListener implements LineListener {
                 private boolean done = false;
@@ -174,6 +199,7 @@ public class Sound {
                     LineEvent.Type eventType = event.getType();
                     if (eventType == LineEvent.Type.STOP || eventType == LineEvent.Type.CLOSE) {
                         done = true;
+                        System.out.println("HERE 1");
                         notifyAll();
                     }
                 }
@@ -181,6 +207,7 @@ public class Sound {
                 public synchronized void waitUntilDone() throws InterruptedException {
                     while (!done) {
                         wait();
+                        System.out.println("HERE 2");
                     }
                 }
             }
@@ -189,17 +216,23 @@ public class Sound {
                 Clip clip = AudioSystem.getClip();
                 clip.open(soundStream);
                 try {
+                    System.out.println("HERE 6");
                     clip.start();
+                    System.out.println("HERE 7");
                     listener.waitUntilDone();
+                    System.out.println("HERE 8");
                 } finally {
                     clip.close();
+                    System.out.println("HERE 3");
                 }
             } finally {
                 soundStream.close();
+                System.out.println("HERE 4");
             }
         } catch (Exception e) {
             System.out.println(e);
         }
+        System.out.println("HERE 5");
     }
 
     /**
@@ -214,6 +247,6 @@ public class Sound {
         System.out.println(mySound.getSoundStream());
         System.out.println(mySound.getSoundDuration());
         AudioInputStream mystream = mySound.getSoundStream();
-        mySound.playSound();
+        // mySound.playSound();
     }
 }
