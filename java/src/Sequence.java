@@ -167,7 +167,7 @@ public class Sequence {
      * Returns a visual representation of a Sequence object in a String
      * @return Visual representation of the Sequence (in String form)
      */
-    public String drawSequenceLine () {
+    public String printSequenceLine () {
         String line1 = "| Your session:\t\t";
         String line2 = "| SubSequence #:\t";
         /** ArrayList of SubSequence objects **/

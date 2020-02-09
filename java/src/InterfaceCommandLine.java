@@ -60,7 +60,7 @@ public class InterfaceCommandLine {
         boolean doneLvl2 = false;
         while (!doneLvl2) {
             System.out.println("+--------------------------------------------------");
-            System.out.println(userSequence.drawSequenceLine());
+            System.out.println(userSequence.printSequenceLine());
             System.out.println("+--------------------------------------------------");
             System.out.println(prompt("What would you like to do?", 2));
             System.out.println("\t1) ADD a SubSequence to the end");
@@ -232,7 +232,7 @@ public class InterfaceCommandLine {
                     break;
                 case 1:
                     System.out.println("+--------------------------------------------------");
-                    System.out.println(userSequence.drawSequenceLine());
+                    System.out.println(userSequence.printSequenceLine());
                     System.out.println("+--------------------------------------------------");
                     break;
                 case 2:
