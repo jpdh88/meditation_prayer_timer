@@ -70,7 +70,7 @@ public class Sequence {
      * Gets the list of available sounds
      * @return A Set object of sound names
      */
-    public Set getSoundList() {
+    public String[] getSoundList() {
         return mainSound.getSoundList();
     }
 

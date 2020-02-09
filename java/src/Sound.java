@@ -126,8 +126,11 @@ public class Sound {
      * Get the names of the available sounds
      * @return A Set containing the names of available sounds
      */
-    public Set getSoundList() {
-        return soundList.keySet();
+    public String[] getSoundList() {
+        Set<String> soundListSet = soundList.keySet();
+        String[] soundListArray = new String[soundListSet.size()];
+
+        return soundListSet.toArray(soundListArray);
     }
 
     /**

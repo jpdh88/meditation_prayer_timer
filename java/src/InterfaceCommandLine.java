@@ -196,12 +196,15 @@ public class InterfaceCommandLine {
                     }
                     break;
                 case 6:
-                    System.out.println("\tCurrent Main sound: " + userSequence.getMainSound());
-                    System.out.println("\tPlease choose from: ");
+                    System.out.println(prompt("Please choose from: ", 3));
 
                     // iterate through each member of the soundList array
                     int soundNum = 1;
-                    Set<String> soundList = userSequence.getSoundList();
+
+                    String[] soundList = userSequence.getSoundList();
+
+                    System.out.println("\tCurrent Main sound: " + userSequence.getMainSound());
+
                     for (String soundName: soundList) {
                         System.out.println("\t\t" + soundNum + ") " + soundName);
                         soundNum++;
