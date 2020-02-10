@@ -57,36 +57,36 @@ public class InterfaceCommandLine {
      * @param soundList The array of sounds to be displayed
      * @return A numbered list of available sounds in a String.
      */
-    public static String formatSoundList(String[] soundList) {
+    public static String getFormattedSoundList(String[] soundList) {
         int soundNum = 1; // Give each array item a number
-        String formattedSoundList = "";
+        String getFormattedSoundList = "";
         for (String soundName: soundList) {
-            if (soundName == userSequence.getMainSound() && soundName == userSequence.getSecondarySound()) {
-                formattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Main and Secondary Sound)" + "\n";
+            if (soundName == userSequence.getMainSound() && soundName == userSequence.getIntervalSound()) {
+                getFormattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Main and Interval Sound)" + "\n";
             } else if (soundName == userSequence.getMainSound()) {
-                formattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Main Sound)" + "\n";
-            } else if (soundName == userSequence.getSecondarySound()) {
-                formattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Secondary Sound)" + "\n";
+                getFormattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Main Sound)" + "\n";
+            } else if (soundName == userSequence.getIntervalSound()) {
+                getFormattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Interval Sound)" + "\n";
             } else {
-                formattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + "\n";
+                getFormattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + "\n";
             }
             soundNum++;
         }
 
-        return formattedSoundList;
+        return getFormattedSoundList;
     }
 
     /**
-     * Method for helping with selection of Main or Secondary sound (using this saves having to duplicate the loop)
-     * @param soundType Either "Main Sound" or "Secondary Sound"
+     * Method for helping with selection of Main or Interval sound (using this saves having to duplicate the loop)
+     * @param soundType Either "Main Sound" or "Interval Sound"
      * @return The name of the sound chosen
      */
     public static String selectSound(String soundType) {
-        String[] soundList = userSequence.getSoundList();
+        String[] soundList = Sound.getSoundList();
 
         // Print list of sounds
         System.out.println("\tSound List:");
-        System.out.print(formatSoundList(soundList));
+        System.out.print(getFormattedSoundList(soundList));
         System.out.println("\t---");
         System.out.println("\t 0) Exit");
 
@@ -127,7 +127,7 @@ public class InterfaceCommandLine {
             System.out.println("\t4) SWAP two SubSequences");
             System.out.println("\t5) DELETE a SubSequence");
             System.out.println("\t6) Change Main Sound");
-            System.out.println("\t7) Change Secondary Sound");
+            System.out.println("\t7) Change Interval Sound");
             System.out.println("\t8) Play a sound");
             System.out.println("\t---");
             System.out.println("\t0) Exit");
@@ -255,18 +255,18 @@ public class InterfaceCommandLine {
                             }
                     }
                     break;
-                case 6:
+                case 6: // change the main sound
                     userSequence.setMainSound(selectSound(("Main Sound")));
                     break;
-                case 7:
-                    userSequence.setMainSound(selectSound(("Secondary Sound")));
+                case 7: // change the interval sound
+                    userSequence.setMainSound(selectSound(("Interval Sound")));
                     break;
-                case 8:
+                case 8: // play a sound
                     boolean doneCase8 = false;
                     while (!doneCase8) {
-                        String[] soundList = userSequence.getSoundList();
+                        String[] soundList = Sound.getSoundList();
                         System.out.println("\tSound List:");
-                        System.out.print(formatSoundList(soundList));
+                        System.out.print(getFormattedSoundList(soundList));
                         System.out.println("\t---");
                         System.out.println("\t 0) Exit");
 
@@ -277,7 +277,7 @@ public class InterfaceCommandLine {
                             doneCase8 = true;
                         } else if (whichSound > 0 && whichSound <= soundList.length) {
                             try {
-                                String soundPath = userSequence.getPathFromSoundList(soundList[whichSound - 1]);
+                                String soundPath = Sound.getPathFromSoundList(soundList[whichSound - 1]);
                                 Sound.playSound(Sound.createSoundStream(soundPath));
                             } catch (Exception e) {
                                 System.out.println("InterfaceCommandLine Class Error: " + e);

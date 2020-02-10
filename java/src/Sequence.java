@@ -18,7 +18,7 @@ public class Sequence {
     /** Sound Object for first and last SubSequences (the "Main" SubSequences) **/
     private Sound mainSound;
     /** Sound Object for intervening SubSequences **/
-    private Sound secondarySound;
+    private Sound intervalSound;
 
     // METHODS
     // *** Constructors
@@ -29,7 +29,7 @@ public class Sequence {
         subSequenceArray.add( new SubSequence(1800, true));
         subSequenceArray.add( new SubSequence(0, false));
         mainSound = new Sound(true);
-        secondarySound = new Sound(false);
+        intervalSound = new Sound(false);
     }
 
     // *** Values methods
@@ -51,38 +51,19 @@ public class Sequence {
     }
 
     /**
-     * Gets the sound associated with the Secondary SubSequences
+     * Gets the sound associated with the Interval SubSequences
      * @return The name of the sound that will be played
      */
-    public String getSecondarySound() {
-        return secondarySound.getSoundName();
+    public String getIntervalSound() {
+        return intervalSound.getSoundName();
     }
 
     /**
-     * Sets the sound name associated with the Secondary SubSequences
+     * Sets the sound name associated with the Interval SubSequences
      * @param soundName The name of the sound (must be in the Sound.soundList)
      */
-    public void setSecondarySound(String soundName) {
-        secondarySound.setSound(soundName);
-    }
-
-    /**
-     * Gets the full path associated with a sound's name from the master soundList
-     * @param soundName The name of the sound
-     * @return the full path associated with the sound's name
-     */
-    public String getPathFromSoundList(String soundName) {
-        // we could get this from either the mainSound or the secondary Sound
-        // all we want is the full path of a sound, which is always the same for every instance of a Sound object
-        return mainSound.getPathFromSoundList(soundName);
-    }
-
-    /**
-     * Gets the list of available sounds
-     * @return A Set object of sound names
-     */
-    public String[] getSoundList() {
-        return mainSound.getSoundList();
+    public void setIntervalSound(String soundName) {
+        intervalSound.setSound(soundName);
     }
 
     /**
