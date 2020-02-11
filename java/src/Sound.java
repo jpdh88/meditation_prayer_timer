@@ -1,5 +1,6 @@
 import javax.sound.sampled.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,50 +89,35 @@ public class Sound {
      *  - From: https://stackoverflow.com/tags/javasound/info
      *  - From: https://stackoverflow.com/questions/577724/trouble-playing-wav-in-java/577926#577926
      */
-    public static synchronized void playSound(AudioInputStream soundStream) {
-        try {
-            class AudioListener implements LineListener {
-                private boolean done = false;
-
-                @Override
-                public synchronized void update(LineEvent event) {
-                    LineEvent.Type eventType = event.getType();
-                    if (eventType == LineEvent.Type.STOP || eventType == LineEvent.Type.CLOSE) {
-                        done = true;
-                        System.out.println("HERE 1");
-                        notifyAll();
-                    }
-                }
-
-                public synchronized void waitUntilDone() throws InterruptedException {
-                    while (!done) {
-                        wait();
-                        System.out.println("HERE 2");
-                    }
+    public static void playSound(AudioInputStream audioInputStream) throws IOException,
+            UnsupportedAudioFileException, LineUnavailableException, InterruptedException {
+        class AudioListener implements LineListener {
+            private boolean done = false;
+            @Override public synchronized void update(LineEvent event) {
+                LineEvent.Type eventType = event.getType();
+                if (eventType == LineEvent.Type.STOP || eventType == LineEvent.Type.CLOSE) {
+                    done = true;
+                    notifyAll();
                 }
             }
-            AudioListener listener = new AudioListener();
-            try {
-                Clip clip = AudioSystem.getClip();
-                clip.open(soundStream);
-                try {
-                    System.out.println("HERE 6");
-                    clip.start();
-                    System.out.println("HERE 7");
-                    listener.waitUntilDone();
-                    System.out.println("HERE 8");
-                } finally {
-                    clip.close();
-                    System.out.println("HERE 3");
-                }
-            } finally {
-                soundStream.close();
-                System.out.println("HERE 4");
+            public synchronized void waitUntilDone() throws InterruptedException {
+                while (!done) { wait(); }
             }
-        } catch (Exception e) {
-            System.out.println(e);
         }
-        System.out.println("HERE 5");
+        AudioListener listener = new AudioListener();
+        try {
+            Clip clip = AudioSystem.getClip();
+            clip.addLineListener(listener);
+            clip.open(audioInputStream);
+            try {
+                clip.start();
+                listener.waitUntilDone();
+            } finally {
+                clip.close();
+            }
+        } finally {
+            audioInputStream.close();
+        }
     }
 
     // *** Constructors

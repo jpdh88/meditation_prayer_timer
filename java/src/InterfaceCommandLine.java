@@ -278,11 +278,12 @@ public class InterfaceCommandLine {
                         } else if (whichSound > 0 && whichSound <= soundList.length) {
                             try {
                                 String soundPath = Sound.getPathFromSoundList(soundList[whichSound - 1]);
+                                System.out.print("Playing sound...");
                                 Sound.playSound(Sound.createSoundStream(soundPath));
+                                System.out.println("Done.");
                             } catch (Exception e) {
                                 System.out.println("InterfaceCommandLine Class Error: " + e);
                             }
-                            doneCase8 = true;
                         } else {
                             System.out.println(errorMsg("That is not a valid choice."));
                         }
