@@ -126,9 +126,9 @@ public class InterfaceCommandLine {
             System.out.println("\t3) EDIT a SubSequence");
             System.out.println("\t4) SWAP two SubSequences");
             System.out.println("\t5) DELETE a SubSequence");
-            System.out.println("\t6) Change Main Sound");
-            System.out.println("\t7) Change Interval Sound");
-            System.out.println("\t8) Play a sound");
+            System.out.println("\t6) CHANGE Main Sound");
+            System.out.println("\t7) CHANGE Interval Sound");
+            System.out.println("\t8) PLAY a sound");
             System.out.println("\t---");
             System.out.println("\t0) Exit");
             int userInput = keybIn.nextInt();
@@ -255,21 +255,21 @@ public class InterfaceCommandLine {
                             }
                     }
                     break;
-                case 6: // change the main sound
+                case 6: // CHANGE the main sound
                     userSequence.setMainSound(selectSound(("Main Sound")));
                     break;
-                case 7: // change the interval sound
+                case 7: // CHANGE the interval sound
                     userSequence.setMainSound(selectSound(("Interval Sound")));
                     break;
-                case 8: // play a sound
+                case 8: // PLAY a sound
+                    String[] soundList = Sound.getSoundList();
+                    System.out.println("\tSound List:");
+                    System.out.print(getFormattedSoundList(soundList));
+                    System.out.println("\t---");
+                    System.out.println("\t 0) Exit");
+
                     boolean doneCase8 = false;
                     while (!doneCase8) {
-                        String[] soundList = Sound.getSoundList();
-                        System.out.println("\tSound List:");
-                        System.out.print(getFormattedSoundList(soundList));
-                        System.out.println("\t---");
-                        System.out.println("\t 0) Exit");
-
                         System.out.println(prompt("Which sound would you like to play?", 3));
                         int whichSound = keybIn.nextInt();
 
@@ -278,7 +278,7 @@ public class InterfaceCommandLine {
                         } else if (whichSound > 0 && whichSound <= soundList.length) {
                             try {
                                 String soundPath = Sound.getPathFromSoundList(soundList[whichSound - 1]);
-                                System.out.print("Playing sound...");
+                                System.out.print("\tPlaying sound...");
                                 Sound.playSound(Sound.createSoundStream(soundPath));
                                 System.out.println("Done.");
                             } catch (Exception e) {
@@ -307,7 +307,10 @@ public class InterfaceCommandLine {
         while (!doneProgram) {
             System.out.println(prompt("What would you like to do?", 1));
             System.out.println("\t1) See my session");
-            System.out.println("\t2) Edit my session");
+            System.out.println("\t2) Edit session details");
+            System.out.println("\t3) Start my session (not done)");
+            System.out.println("\t4) Save my session (not done)");
+            System.out.println("\t5) Load a session (not done)");
             System.out.println("\t---");
             System.out.println("\t0) Exit");
             int userChoice = keybIn.nextInt();

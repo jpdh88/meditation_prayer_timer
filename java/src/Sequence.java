@@ -27,7 +27,7 @@ public class Sequence {
      */
     public Sequence() {
         subSequenceArray.add( new SubSequence(1800, true));
-        subSequenceArray.add( new SubSequence(0, false));
+        subSequenceArray.add( new SubSequence(0, true));
         mainSound = new Sound(true);
         intervalSound = new Sound(false);
     }
@@ -185,6 +185,7 @@ public class Sequence {
         }
         return line1 + "\n" + line2;
     }
+
     /**
      * toString method
      * @return Returns a String of the Object's variables
