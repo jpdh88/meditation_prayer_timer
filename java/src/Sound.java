@@ -92,8 +92,15 @@ public class Sound {
      */
     public static void playSound(AudioInputStream audioInputStream) throws IOException,
             UnsupportedAudioFileException, LineUnavailableException, InterruptedException {
+        /**
+         * Checks the status of a playing sound file for if it is playing or not
+         */
         class AudioListener implements LineListener {
+
+            // sentinel flag: has the sound stopped playing?
             private boolean done = false;
+
+            // checks to see if the sound is still playing; if its not, it will set done = true
             @Override public synchronized void update(LineEvent event) {
                 LineEvent.Type eventType = event.getType();
                 if (eventType == LineEvent.Type.STOP || eventType == LineEvent.Type.CLOSE) {
@@ -101,18 +108,23 @@ public class Sound {
                     notifyAll();
                 }
             }
+
+            // constantly checks for a change in the sentinel flag to determine if the sound has finished
             public synchronized void waitUntilDone() throws InterruptedException {
                 while (!done) { wait(); }
             }
         }
+
+        // Instantiate the Audio Listener
         AudioListener listener = new AudioListener();
+
         try {
             Clip clip = AudioSystem.getClip();
             clip.addLineListener(listener);
             clip.open(audioInputStream);
             try {
-                clip.start();
-                listener.waitUntilDone();
+                clip.start(); // play the sound
+                listener.waitUntilDone(); // start the Audio Listener
             } finally {
                 clip.close();
             }

@@ -16,9 +16,9 @@ public class Sequence {
     /** Array of SubSequences **/
     private ArrayList<SubSequence> subSequenceArray = new ArrayList<>();
     /** Sound Object for first and last SubSequences (the "Main" SubSequences) **/
-    private Sound mainSound;
+    private static Sound mainSound;
     /** Sound Object for intervening SubSequences **/
-    private Sound intervalSound;
+    private static Sound intervalSound;
 
     // METHODS
     // *** Constructors
@@ -110,8 +110,8 @@ public class Sequence {
      * @param newDuration The new duration of the SubSequence
      */
     public void editSubSequence (int index, int newDuration) {
-        if (index == 0 || index == subSequenceArray.size() - 1) {
-            System.out.println("Sequence Class Error: You can't edit the first or last SubSequence.");
+        if (index == subSequenceArray.size() - 1) {
+            System.out.println("Sequence Class Error: You can't edit that one.");
         } else if (index < 0 || index >= subSequenceArray.size()){
             System.out.println("Sequence Class Error: Index out of range.");
         } else {
