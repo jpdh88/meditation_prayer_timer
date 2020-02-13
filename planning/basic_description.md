@@ -37,3 +37,4 @@ SubSequence = a duration
                 - a first or last SubSequences (a "Main" SubSequence)
                 - an intervening/Interval SubSequence
                 + there are two types b/c each type has a different sound associated w/ it
+Sounds: are 15s exactly (to make things easier with the timer)
