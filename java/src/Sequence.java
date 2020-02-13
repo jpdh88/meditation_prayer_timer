@@ -173,6 +173,7 @@ public class Sequence {
             String dashes = new String(new char[(duration / 60)]).replace("\0", "-");
             String spaces = new String(new char[(duration / 60)]).replace("\0", " ");
 
+            // distinguish main sounds from interval sounds
             if (subSequence.getIsFirstOrLast()) {
                 line1 += "O" + dashes;
             } else{
