@@ -10,6 +10,8 @@ public class InterfaceCommandLine {
     private static Sequence userSequence = new Sequence();
     // For user input with the keyboard
     private static Scanner keybIn = new Scanner(System.in);
+    // Minimum length of a SubSequence
+    private static int minSSLength = 30; // in seconds
 
     /**
      * Method for error messages: ensures a consistent format for error messages
@@ -138,65 +140,80 @@ public class InterfaceCommandLine {
                     doneLvl2 = true;
                     break;
                 case 1: // Add at end
-                    boolean doneCase1 = false;
-                    while (!doneCase1) {
+                    while (true) {
                         System.out.println(prompt("ADD - How many seconds do you want it to be?", 3));
                         int duration = keybIn.nextInt();
 
-                        if (duration < 0) {
-                            System.out.println(errorMsg("Duration must be 0 or greater."));
+                        if (duration < minSSLength) {
+                            System.out.println(errorMsg("Duration must be " + minSSLength + " seconds or greater."));
                         } else {
                             userSequence.addSubSequence(duration);
-                            doneCase1 = true;
+                            break;
                         }
                     }
                     break;
                 case 2: // Add at location
                     boolean doneCase2 = false; // sentinel value
                     while (!doneCase2) {
+                        int duration2;
                         int numSubSequences = userSequence.getNumSubSequences();
 
-                        System.out.println(prompt("ADD - How many seconds do you want it to be?", 3));
-                        int duration2 = keybIn.nextInt();
+                        // Get and validate the number of seconds
+                        while (true) {
+                            System.out.println(prompt("ADD - How many seconds do you want it to be?", 3));
+                            duration2 = keybIn.nextInt();
 
-                        // If there are only two SubSequences in the Sequence, there is no need to ask for a location
+                            if (duration2 < minSSLength) {
+                                System.out.println(errorMsg("Duration must be " + minSSLength + " seconds or greater."));
+                            } else {
+                                break;
+                            }
+                        }
+
+                        // Get and validate the location of the Interval
                         int location;
-                        if (numSubSequences == 2) {
+                        if (numSubSequences == 2) { // If there are only two SubSequences in the Sequence,
+                                                    //  there is no need to ask for a location
                             location = 2; //
                         } else {
-                            System.out.println(prompt("ADD - At what location?", 3));
-                            location = keybIn.nextInt();
+                            while (true) {
+                                System.out.println(prompt("ADD - At what location?", 3));
+                                location = keybIn.nextInt();
+
+                                if (location == 1) {
+                                    System.out.println(errorMsg("You can't add a sequence before the first one"));
+                                } else if (location < 0) {
+                                    System.out.println(errorMsg("That's an invalid option."));
+                                } else {
+                                    break;
+                                }
+                            }
                         }
 
                         // Evaluate the inputted location
-                        switch (location) {
-                            case 0:
-                                doneCase2 = true;
-                                break;
-                            case 1:
-                                System.out.println(errorMsg("You can't add a sequence before the first one"));
-                                break;
-                            default:
-                                if (location > numSubSequences) {
-                                    userSequence.addSubSequence(duration2);
-                                } else {
-                                    userSequence.addSubSequence(duration2, location - 1);
-                                }
-                                doneCase2 = true;
+                        if (location == 0) {
+                            break;
+                        } else {
+                            if (location > numSubSequences) { // add new Interval to the end if location > number of Intervals
+                                userSequence.addSubSequence(duration2);
+                            } else {
+                                userSequence.addSubSequence(duration2, location - 1);
+                            }
+                            break;
                         }
                     }
                     break;
                 case 3: // Edit
-                    boolean doneCase3 = false;
-                    while (!doneCase3) {
+                    while (true) {
                         System.out.println(prompt("EDIT - What SubSequence would you like to edit?", 3));
                         int whichSubSequence = keybIn.nextInt();
 
                         int numSubSequences = userSequence.getNumSubSequences();
+
                         if (whichSubSequence == numSubSequences) {
                             System.out.println(errorMsg("You can't edit the final sequence."));
                         } else if (whichSubSequence == 0) {
-                            doneCase3 = true;
+                            break;
                         } else if (whichSubSequence < 0 || whichSubSequence > numSubSequences) {
                             System.out.println(errorMsg("Invalid choice."));
                         } else {
@@ -204,7 +221,7 @@ public class InterfaceCommandLine {
                             int duration3 = keybIn.nextInt();
 
                             userSequence.editSubSequence(whichSubSequence - 1, duration3);
-                            doneCase3 = true;
+                            break;
                         }
                     }
                     break;
@@ -268,13 +285,12 @@ public class InterfaceCommandLine {
                     System.out.println("\t---");
                     System.out.println("\t 0) Exit");
 
-                    boolean doneCase8 = false;
-                    while (!doneCase8) {
+                    while (true) {
                         System.out.println(prompt("Which sound would you like to play?", 3));
                         int whichSound = keybIn.nextInt();
 
                         if (whichSound == 0) {
-                            doneCase8 = true;
+                            break;
                         } else if (whichSound > 0 && whichSound <= soundList.length) {
                             try {
                                 String soundPath = Sound.getPathFromSoundList(soundList[whichSound - 1]);
