@@ -1,20 +1,20 @@
 /**
- * Represents a SubSequence object.
+ * Represents an Interval object.
  * @author Joseph Haley
  */
-public class SubSequence {
+public class Interval {
     // VARIABLES
-    /** Whether the SubSequence is first or last ( = True), or not ( = False) */
+    /** Whether the Interval is first or last ( = True), or not ( = False) */
     private boolean isFirstOrLast;
-    /** Duration of the SubSequence */
+    /** Duration of the Interval */
     private int duration; // in seconds
 
     // METHODS
     // *** Constructors
     /**
-     * Constructor: Used to create SubSequences
+     * Constructor: Used to create Intervals
      */
-    public SubSequence(int duration, boolean isFirstOrLast) {
+    public Interval(int duration, boolean isFirstOrLast) {
         this.isFirstOrLast = isFirstOrLast;
         this.duration = duration;
     }
@@ -40,16 +40,16 @@ public class SubSequence {
     }
 
     /**
-     * Sets whether this SubSequence is a first or last / Main SubSequence
-     * @param isFirstOrLast whether this SubSequence is a Main SubSequence or not
+     * Sets whether this Interval is a first or last / Main Interval
+     * @param isFirstOrLast whether this Interval is a Main Interval or not
      */
     public void setIsFirstOrLast(boolean isFirstOrLast) {
         this.isFirstOrLast = isFirstOrLast;
     }
 
     /**
-     * Gets whether this SubSequence is a first or last / Main SubSequence
-     * @return whether this SubSequence is a Main SubSequence
+     * Gets whether this Interval is a first or last / Main Interval
+     * @return whether this Interval is a Main Interval
      */
     public boolean getIsFirstOrLast() {
         return isFirstOrLast;
@@ -64,13 +64,13 @@ public class SubSequence {
 
     // MAIN METHOD FOR TESTING
     public static void main(String[] args) {
-        SubSequence ss1 = new SubSequence(1800, true);
+        Interval ss1 = new Interval(1800, true);
         System.out.println(ss1);
 
-        SubSequence ss2 = new SubSequence(50, false);
+        Interval ss2 = new Interval(50, false);
         System.out.println(ss2);
 
-        SubSequence ss3 = new SubSequence(500, false);
+        Interval ss3 = new Interval(500, false);
         System.out.println(ss3);
     }
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents a Sound object. A Sound object stores the sound to be used in a SubSequence, information related to that
+ * Represents a Sound object. A Sound object stores the sound to be used in an Interval, information related to that
  * sound, a list of all the available sounds, etc.
  *
  * @author Joseph Haley
@@ -145,13 +145,13 @@ public class Sound {
 
     /**
      * Constructor method for when defaults are set up
-     * @param isFirstOrLast Whether the Sound object will be associated with a Main or a Interval SubSequence
+     * @param isFirstOrLast Whether the Sound object will be associated with a Main or an Interval Interval
      */
     public Sound(boolean isFirstOrLast) {
         populateSoundList();
-        if (isFirstOrLast == true) { // is a first or last SubSequence
+        if (isFirstOrLast == true) { // is a first or last Interval
             setSound("Meditation Bell 1");
-        } else { // is an intervening SubSequence
+        } else { // is an intervening Interval
             setSound("Meditation Bell 2");
         }
     }

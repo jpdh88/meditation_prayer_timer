@@ -23,18 +23,18 @@ E.g. you might want to do technique x for 20 minutes, then begin technique y for
 ## Basic Plan
 
 A session will be represented by a Sequence (a length of time).
-A Sequence will be composed of SubSequences.
-A SubSequence is composed of a sound and a duration. A sound is played and the duration timer begins.
-The first SubSequence in the sequence must use primary sound; the last Subsequence in the sequence must use Primary sound and be of duration 0 (really, duration of Primary sound)
-SubSequences in between the first and last SubSequences use Interval sound and have a duration > 0.
+A Sequence will be composed of Intervals.
+An Interval is composed of a sound and a duration. A sound is played and the duration timer begins.
+The first Interval in the sequence must use primary sound; the last Interal in the sequence must use Primary sound and be of duration 0 (actually, duration of Primary sound)
+Intervals in between the first and last Intervals use Secondary sound and have a duration > 0.
 
 ## Glossary/More Info.
 A meditation/prayer session is represented by a Sequence.
 Sequence    = a series of SubSequences
-            = two Sound Objects (one for Main SubSequences and one for Interval SubSequences)
-SubSequence = a duration
+            = two Sound Objects (one for Main Intervals and one for Secondary Intervals)
+Interval = a duration
             = a "type":
-                - a first or last SubSequences (a "Main" SubSequence)
-                - an intervening/Interval SubSequence
+                - a first or last SubSequences (a "Main" Interval)
+                - an intervening Interval
                 + there are two types b/c each type has a different sound associated w/ it
 Sounds: are 15s exactly (to make things easier with the timer)

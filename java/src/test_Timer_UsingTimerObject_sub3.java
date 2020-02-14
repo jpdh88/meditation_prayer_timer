@@ -23,12 +23,43 @@
  */
 
 import javax.sound.sampled.AudioInputStream;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
-public class test_Timer_UsingTimerObject {
+public class test_Timer_UsingTimerObject_sub3 {
+
+    public static class SilenceTask extends TimerTask {
+        // VARIABLES
+        private int duration;
+
+        // METHODS
+        // *** Constructors
+        public SilenceTask (int duration) {this.duration = duration;}
+
+        // *** Utility Methods
+        public void run() {
+            long startTime = System.currentTimeMillis();
+            long elapsedTime = 0L;
+            int oneMin = 60*1000;
+
+            int seconds = 0;
+            boolean hasDisplayed = false;
+            int lastSecond = 0;
+            while (elapsedTime <= 5000) {
+                if (elapsedTime % 1000 == 0) {
+                    if (hasDisplayed == false) {
+                        System.out.println(seconds);
+                        seconds++;
+                        hasDisplayed = true;
+                    }
+                }
+                if (lastSecond + 1000 == elapsedTime) {
+                    hasDisplayed = false;
+                    lastSecond += 1000;
+                }
+                elapsedTime = (new Date()).getTime() - startTime;
+            }
+        }
+    }
 
     public static class PlaySoundTask extends TimerTask {
         // VARIABLES
@@ -44,7 +75,7 @@ public class test_Timer_UsingTimerObject {
             this.sound = sound;
         }
 
-        // Utility methods
+        // *** Utility methods
         /**
          * The code that is run by the Timer
          */

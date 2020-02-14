@@ -10,8 +10,8 @@ public class InterfaceCommandLine {
     private static Sequence userSequence = new Sequence();
     // For user input with the keyboard
     private static Scanner keybIn = new Scanner(System.in);
-    // Minimum length of a SubSequence
-    private static int minSSLength = 30; // in seconds
+    // Minimum length of an Interval
+    private static int minIntervalLength = 30; // in seconds
 
     /**
      * Method for error messages: ensures a consistent format for error messages
@@ -123,11 +123,11 @@ public class InterfaceCommandLine {
             System.out.println(userSequence.printSequenceLine());
             System.out.println("+--------------------------------------------------");
             System.out.println(prompt("What would you like to do?", 2));
-            System.out.println("\t1) ADD a SubSequence to the end");
-            System.out.println("\t2) ADD a SubSequence at a location");
-            System.out.println("\t3) EDIT a SubSequence");
-            System.out.println("\t4) SWAP two SubSequences");
-            System.out.println("\t5) DELETE a SubSequence");
+            System.out.println("\t1) ADD an Interval to the end");
+            System.out.println("\t2) ADD an Interval at a location");
+            System.out.println("\t3) EDIT an Interval");
+            System.out.println("\t4) SWAP two Intervals");
+            System.out.println("\t5) DELETE an Interval");
             System.out.println("\t6) CHANGE Main Sound");
             System.out.println("\t7) CHANGE Interval Sound");
             System.out.println("\t8) PLAY a sound");
@@ -144,10 +144,10 @@ public class InterfaceCommandLine {
                         System.out.println(prompt("ADD - How many seconds do you want it to be?", 3));
                         int duration = keybIn.nextInt();
 
-                        if (duration < minSSLength) {
-                            System.out.println(errorMsg("Duration must be " + minSSLength + " seconds or greater."));
+                        if (duration < minIntervalLength) {
+                            System.out.println(errorMsg("Duration must be " + minIntervalLength + " seconds or greater."));
                         } else {
-                            userSequence.addSubSequence(duration);
+                            userSequence.addInterval(duration);
                             break;
                         }
                     }
@@ -156,15 +156,15 @@ public class InterfaceCommandLine {
                     boolean doneCase2 = false; // sentinel value
                     while (!doneCase2) {
                         int duration2;
-                        int numSubSequences = userSequence.getNumSubSequences();
+                        int numIntervals = userSequence.getNumIntervals();
 
                         // Get and validate the number of seconds
                         while (true) {
                             System.out.println(prompt("ADD - How many seconds do you want it to be?", 3));
                             duration2 = keybIn.nextInt();
 
-                            if (duration2 < minSSLength) {
-                                System.out.println(errorMsg("Duration must be " + minSSLength + " seconds or greater."));
+                            if (duration2 < minIntervalLength) {
+                                System.out.println(errorMsg("Duration must be " + minIntervalLength + " seconds or greater."));
                             } else {
                                 break;
                             }
@@ -172,7 +172,7 @@ public class InterfaceCommandLine {
 
                         // Get and validate the location of the Interval
                         int location;
-                        if (numSubSequences == 2) { // If there are only two SubSequences in the Sequence,
+                        if (numIntervals == 2) { // If there are only two Intervals in the Sequence,
                                                     //  there is no need to ask for a location
                             location = 2; //
                         } else {
@@ -194,10 +194,10 @@ public class InterfaceCommandLine {
                         if (location == 0) {
                             break;
                         } else {
-                            if (location > numSubSequences) { // add new Interval to the end if location > number of Intervals
-                                userSequence.addSubSequence(duration2);
+                            if (location > numIntervals) { // add new Interval to the end if location > number of Intervals
+                                userSequence.addInterval(duration2);
                             } else {
-                                userSequence.addSubSequence(duration2, location - 1);
+                                userSequence.addInterval(duration2, location - 1);
                             }
                             break;
                         }
@@ -205,43 +205,43 @@ public class InterfaceCommandLine {
                     break;
                 case 3: // Edit
                     while (true) {
-                        System.out.println(prompt("EDIT - What SubSequence would you like to edit?", 3));
-                        int whichSubSequence = keybIn.nextInt();
+                        System.out.println(prompt("EDIT - What Interval would you like to edit?", 3));
+                        int whichInterval = keybIn.nextInt();
 
-                        int numSubSequences = userSequence.getNumSubSequences();
+                        int numIntervals = userSequence.getNumIntervals();
 
-                        if (whichSubSequence == numSubSequences) {
+                        if (whichInterval == numIntervals) {
                             System.out.println(errorMsg("You can't edit the final sequence."));
-                        } else if (whichSubSequence == 0) {
+                        } else if (whichInterval == 0) {
                             break;
-                        } else if (whichSubSequence < 0 || whichSubSequence > numSubSequences) {
+                        } else if (whichInterval < 0 || whichInterval > numIntervals) {
                             System.out.println(errorMsg("Invalid choice."));
                         } else {
                             System.out.println(prompt("EDIT - What new duration do you want to give it?", 3));
                             int duration3 = keybIn.nextInt();
 
-                            userSequence.editSubSequence(whichSubSequence - 1, duration3);
+                            userSequence.editInterval(whichInterval - 1, duration3);
                             break;
                         }
                     }
                     break;
                 case 4: // Swap
-                    switch (userSequence.getNumSubSequences()) {
+                    switch (userSequence.getNumIntervals()) {
                         case 2:
                         case 3:
-                            System.out.println(errorMsg("There are not enough SubSequences for SWAP."));
+                            System.out.println(errorMsg("There are not enough Intervals for SWAP."));
                             break;
                         default:
                             boolean doneCase4 = false;
                             while (!doneCase4) {
-                                System.out.println(prompt("SWAP - Which are the two SubSequences you would like to swap?", 3));
+                                System.out.println(prompt("SWAP - Which are the two Intervals you would like to swap?", 3));
                                 int swapSequence1 = keybIn.nextInt();
                                 int swapSequence2 = keybIn.nextInt();
 
                                 if (swapSequence1 == 0 || swapSequence2 == 0) {
                                     doneCase4 = true;
                                 } else {
-                                    userSequence.swapSubSequences(swapSequence1 - 1, swapSequence2 - 1);
+                                    userSequence.swapIntervals(swapSequence1 - 1, swapSequence2 - 1);
                                     doneCase4 = true;
                                 }
                             }
@@ -249,24 +249,24 @@ public class InterfaceCommandLine {
                     }
                     break;
                 case 5: // DELETE
-                    switch (userSequence.getNumSubSequences()) {
+                    switch (userSequence.getNumIntervals()) {
                         case 2:
-                            System.out.println(errorMsg("There are no SubSequences to DELETE."));
+                            System.out.println(errorMsg("There are no Intervals to DELETE."));
                             break;
                         default:
                             boolean doneCase5 = false;
                             while (!doneCase5) {
-                                System.out.println(prompt("DELETE - Which SubSequence would you like to delete?", 3));
-                                int whichSubSequence = keybIn.nextInt();
+                                System.out.println(prompt("DELETE - Which Interval would you like to delete?", 3));
+                                int whichInterval = keybIn.nextInt();
 
-                                if (whichSubSequence == 0) {
+                                if (whichInterval == 0) {
                                     doneCase5 = true;
-                                } else if (whichSubSequence < 0 || whichSubSequence > userSequence.getNumSubSequences()) {
+                                } else if (whichInterval < 0 || whichInterval > userSequence.getNumIntervals()) {
                                     System.out.println(errorMsg("Invalid choice."));
-                                } else if (whichSubSequence == 1 || whichSubSequence == userSequence.getNumSubSequences()) {
+                                } else if (whichInterval == 1 || whichInterval == userSequence.getNumIntervals()) {
                                     System.out.println(errorMsg("You can't remove the first or last sequence."));
                                 } else {
-                                    userSequence.deleteSubSequence(whichSubSequence - 1);
+                                    userSequence.deleteInterval(whichInterval - 1);
                                     doneCase5 = true;
                                 }
                             }
@@ -275,8 +275,8 @@ public class InterfaceCommandLine {
                 case 6: // CHANGE the main sound
                     userSequence.setMainSound(selectSound(("Main Sound")));
                     break;
-                case 7: // CHANGE the interval sound
-                    userSequence.setMainSound(selectSound(("Interval Sound")));
+                case 7: // CHANGE the secondary sound
+                    userSequence.setMainSound(selectSound(("Secondary Sound")));
                     break;
                 case 8: // PLAY a sound
                     String[] soundList = Sound.getSoundList();
