@@ -1,5 +1,3 @@
-package test_code;
-
 import java.util.Date;
 
 /**
@@ -7,7 +5,7 @@ import java.util.Date;
  *
  *  Adapted from second answer here: https://stackoverflow.com/questions/4044726/how-to-set-a-timer-in-java
  */
-public class TimerTechnique1 {
+public class test_Timer_UsingLoopAndComparison {
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
