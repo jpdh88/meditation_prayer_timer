@@ -13,7 +13,7 @@ class MyTimerTask extends TimerTask {
     }
 }
 
-public class TimerTechnique3 {
+public class test_Timer_UsingTimerObject_sub1 {
 
     public static void main(String[] args) {
         MyTimerTask task = new MyTimerTask();
