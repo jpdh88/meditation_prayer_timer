@@ -24,6 +24,8 @@ public class Sound {
     private AudioInputStream soundStream;
     /** The AudioFormat object of the chosen sound **/
     private AudioFormat soundStreamFormat; // for getting information about the sound file
+    /** length of a sound clip **/
+    public static final int clipDuration = 15; // in seconds
 
 
     // METHODS
