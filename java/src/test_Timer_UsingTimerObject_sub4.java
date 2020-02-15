@@ -25,6 +25,8 @@
 import javax.sound.sampled.AudioInputStream;
 import java.util.*;
 
+// runs a Sequence with nice command-line output
+//  no output for when sound is playing (it hangs the command line)
 public class test_Timer_UsingTimerObject_sub4 {
 
     public static class TimeDurationTask extends TimerTask {
