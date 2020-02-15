@@ -27,25 +27,25 @@ import java.util.*;
 
 public class test_Timer_UsingTimerObject_sub3 {
 
-    public static class SilenceTask extends TimerTask {
+    public static class TimeDurationTask extends TimerTask {
         // VARIABLES
-        private int duration;
+        /** Info: oneMin = 60s * 1000ms **/
+        private int duration; // in milliseconds
 
         // METHODS
         // *** Constructors
-        public SilenceTask (int duration) {this.duration = duration;}
+        public TimeDurationTask (int duration) {this.duration = duration * 1000;}
 
         // *** Utility Methods
         public void run() {
             long startTime = System.currentTimeMillis();
             long elapsedTime = 0L;
-            int oneMin = 60*1000;
 
-            int seconds = 0;
+            int seconds = 16;
             boolean hasDisplayed = false;
-            int lastSecond = 0;
-            while (elapsedTime <= 5000) {
-                if (elapsedTime % 1000 == 0) {
+            long lastSecond = 0L;
+            while (elapsedTime <= duration) {
+                if (elapsedTime % 1000 == 0) { // print something every second
                     if (hasDisplayed == false) {
                         System.out.println(seconds);
                         seconds++;
@@ -82,7 +82,7 @@ public class test_Timer_UsingTimerObject_sub3 {
         public void run() {
             try {
                 Sound.playSound(sound);
-                System.out.println("test");
+                System.out.println("Sound played.");
             } catch (Exception e) {
                 System.out.println("EROROOPROROR");
             }
@@ -94,9 +94,9 @@ public class test_Timer_UsingTimerObject_sub3 {
         Scanner keybIn = new Scanner(System.in);
         Timer timer = new Timer();
         Sequence sequence = new Sequence();
-        sequence.editInterval(0, 5);
-        sequence.addInterval(10);
-        sequence.addInterval(5);
+        sequence.editInterval(0, 20);
+        sequence.addInterval(30);
+        sequence.addInterval(20);
         // Should be: Tone - 5s - Tone - 10s - Tone - 5s - Tone
 
         // Sequence to array of Intervals
@@ -104,45 +104,78 @@ public class test_Timer_UsingTimerObject_sub3 {
         ArrayList<Interval> intervalArrayList = new ArrayList<>(sequence.getSequenceArray());
         /** Convert ArrayList into an Array **/
         Interval[] intervalArray = intervalArrayList.toArray(new Interval[intervalArrayList.size()]);
-        /** TimerTask array = we will build tasks into this **/
-        TimerTask[] timerTasks = new TimerTask[intervalArray.length];
+        /**
+         * TimerTask array = we will build tasks into this
+         *  - General structure:
+         *      task:   O: play Main sound
+         *      task:   -: timer - length of sound (15s)
+         *      task:   o: play Secondary sound
+         *      task:   -: timer - length of sound (15s)
+         *      task:   o: play Secondary sound
+         *      task:   -: timer - length of sound (15s)
+         *      etc...
+         *      task:   O: play Main sound
+         *  - Therefore, length of TimerTask array will be length(Interval array)*2 - 1
+         */
+        TimerTask[] timerTasks = new TimerTask[(intervalArray.length * 2) - 1];
 
-        // Create an array of tasks to be performed by the timer
-        int sSIndex = 0;
-        for (Interval interval : intervalArray) {
-            // Play sound
-            System.out.println("Counter: " + sSIndex);
-            if (interval.getIsFirstOrLast()) {
-                try {
-                    String soundPath = Sound.getPathFromSoundList(sequence.getMainSound());
-                    System.out.println(soundPath);
-                    timerTasks[sSIndex] = new PlaySoundTask(Sound.createSoundStream(soundPath));
-                } catch (Exception e) {
-                    System.out.println("HERE 1");
-                }
-            } else {
-                try {
-                    String soundPath = Sound.getPathFromSoundList(sequence.getIntervalSound());
-                    System.out.println(soundPath);
-                    timerTasks[sSIndex] = new PlaySoundTask(Sound.createSoundStream(soundPath));
-                } catch (Exception e) {
-                    System.out.println("HERE 2");
-                }
+        // Build an array of tasks to be performed by the timer
+        //  - 1) first Interval (index 0 of array)
+        //      Task: Play a sound
+        try {
+            String soundPath = Sound.getPathFromSoundList(sequence.getMainSound());
+            timerTasks[0] = new PlaySoundTask(Sound.createSoundStream(soundPath));
+        } catch (Exception e) {
+            System.out.println("Problem 1");
+        }
+        //      Task: Duration of silence
+        timerTasks[1] = new TimeDurationTask(intervalArray[0].getDuration() - Sound.clipDuration);
+
+        //  - 2) middle intervals
+        int intervalIndex;
+        int taskIndex = 2;
+        for (intervalIndex = 1; intervalIndex <= intervalArray.length - 2; intervalIndex++) {
+            // Task: Play a sound
+            try {
+                String soundPath = Sound.getPathFromSoundList(sequence.getIntervalSound());
+                timerTasks[taskIndex] = new PlaySoundTask(Sound.createSoundStream(soundPath));
+            } catch (Exception e) {
+                System.out.println("Problem 2");
             }
-            sSIndex++;
+            // Task: Duration of silence
+            timerTasks[taskIndex + 1] = new TimeDurationTask(intervalArray[intervalIndex].getDuration() - Sound.clipDuration);
+            taskIndex += 2;
         }
 
-        System.out.println("Num timer tasks: " + timerTasks.length);
-        int taskIndex = 0;
-        long accruedDuration = 1L;
+        //  - 3) final interval
+        try {
+            String soundPath = Sound.getPathFromSoundList(sequence.getMainSound());
+            timerTasks[timerTasks.length - 1] = new PlaySoundTask(Sound.createSoundStream(soundPath));
+        } catch (Exception e) {
+            System.out.println("Problem 3");
+        }
+
         for (TimerTask task: timerTasks) {
-            timer.schedule(task, accruedDuration);
-            if (taskIndex < timerTasks.length - 1) {
-                System.out.println("Duration before next sound: " + intervalArray[taskIndex].getDuration());
-
-                taskIndex++;
-                accruedDuration += (long) intervalArray[taskIndex].getDuration() + 1; // add 1 so its never 0 (produces an error)
-            }
+            System.out.println("Tasks: " + task);
         }
+
+        // Add the above tasks to the Timer with appropriate duration values
+        System.out.println("Num timer tasks: " + timerTasks.length);
+        long accruedDuration = 1L;
+        intervalIndex = 0;
+        for (taskIndex = 0; taskIndex < timerTasks.length - 1; taskIndex += 2) { // takes care of all but final task
+            System.out.println("accruedDuration: " + accruedDuration);
+            System.out.println("taskIndex: " + taskIndex);
+            System.out.println("\ttwo tasks");
+            timer.schedule(timerTasks[taskIndex], accruedDuration);
+            timer.schedule(timerTasks[taskIndex + 1], accruedDuration + Sound.clipDuration);
+            // we delay the second task by the length of the sound clip so that it only starts after the sound has played
+            //  we can do this without losing total time because we subtracted the same amount when we built the task array
+
+            accruedDuration += intervalArray[intervalIndex].getDuration();
+            intervalIndex++;
+        }
+        System.out.println("accruedDuration: " + accruedDuration);
+        timer.schedule(timerTasks[taskIndex], accruedDuration); // the final task
     }
 }
