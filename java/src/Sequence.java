@@ -87,14 +87,14 @@ public class Sequence {
     /**
      * Creates a new Interval and inserts it at index location in intervalArrayList
      * @param index The location in intervalArrayList Where the new Interval is to be added
-     * @param duration The length of the new Interval
+     * @param duration The length of the new Interval in milliseconds
      */
     public void addInterval(int duration, int index) {
         intervalArrayList.add(index, new Interval(duration, false));
     }
     /**
      * Creates a new Interval and inserts it into the second-to-last spot
-     * @param duration The duration of the new Interval
+     * @param duration The duration of the new Interval in milliseconds
      */
     public void addInterval(int duration) {
         if (duration >= 0) {
@@ -108,7 +108,7 @@ public class Sequence {
      * Edit the duration of a particular Interval in the intervalArrayList
      *  - The last Interval in the array cannot be changed
      * @param index The index of the Subsequence in intervalArrayList that is being being edited
-     * @param newDuration The new duration of the Interval
+     * @param newDuration The new duration of the Interval in milliseconds
      */
     public void editInterval (int index, int newDuration) {
         if (index == intervalArrayList.size() - 1) {
@@ -169,13 +169,13 @@ public class Sequence {
         Interval[] intervalArray = intervalArrayList.toArray(new Interval[intervalArrayList.size()]);
 
         int counter = 1;
-        for (Interval subSequence: intervalArrayList) { // iterate through each member of the array
-            int duration = subSequence.getDuration(); // the Interval's duration
+        for (Interval interval: intervalArrayList) { // iterate through each member of the array
+            int duration = interval.getDuration() / 1000; // the Interval's duration in seconds
             String dashes = new String(new char[(duration / 60)]).replace("\0", "-");
             String spaces = new String(new char[(duration / 60)]).replace("\0", " ");
 
             // distinguish main sounds from interval sounds
-            if (subSequence.getIsFirstOrLast()) {
+            if (interval.getIsFirstOrLast()) {
                 line1 += "O" + dashes;
             } else{
                 line1 += "o" + dashes;
