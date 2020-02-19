@@ -2,6 +2,7 @@ import java.util.Scanner;
 
 /**
  * A command-line interface for creating Sequence Objects and running them
+ * Note: any interaction w/ user = seconds; any interaction w/ Objects = milliseconds
  *
  * @author Joseph Haley
  */
@@ -147,7 +148,7 @@ public class InterfaceCommandLine {
                         if (duration < minIntervalLength) {
                             System.out.println(errorMsg("Duration must be " + minIntervalLength + " seconds or greater."));
                         } else {
-                            userSequence.addInterval(duration);
+                            userSequence.addInterval(duration * 1000);
                             break;
                         }
                     }
@@ -195,9 +196,9 @@ public class InterfaceCommandLine {
                             break;
                         } else {
                             if (location > numIntervals) { // add new Interval to the end if location > number of Intervals
-                                userSequence.addInterval(duration2);
+                                userSequence.addInterval(duration2 * 1000);
                             } else {
-                                userSequence.addInterval(duration2, location - 1);
+                                userSequence.addInterval(duration2 * 1000, location - 1);
                             }
                             break;
                         }
@@ -220,7 +221,7 @@ public class InterfaceCommandLine {
                             System.out.println(prompt("EDIT - What new duration do you want to give it?", 3));
                             int duration3 = keybIn.nextInt();
 
-                            userSequence.editInterval(whichInterval - 1, duration3);
+                            userSequence.editInterval(whichInterval - 1, duration3 * 1000);
                             break;
                         }
                     }
