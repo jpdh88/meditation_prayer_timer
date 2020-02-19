@@ -56,10 +56,8 @@ public class SequenceTimer {
 
     /** The Sequence that will be parsed into tasks and then passed to the timer to be run **/
     private Sequence sequence;
-    /** ArrayList of Interval objects **/
-    ArrayList<Interval> intervalArrayList;
-    /** Convert ArrayList into an Array **/
-    Interval[] intervalArray;
+    /** Array of intervals **/
+    private Interval[] intervalArray;
 
     /** The internal timer which will execute the tasks **/
     private Timer timer;
@@ -78,18 +76,17 @@ public class SequenceTimer {
     public SequenceTimer (Sequence sequence) {
         // Initialize sequence-related variables
         this.sequence = sequence;
-        this.intervalArrayList = new ArrayList<>(this.sequence.getSequenceArray());
-        this.intervalArray = intervalArrayList.toArray(new Interval[intervalArrayList.size()]);
+        this.intervalArray = this.sequence.getSequenceArray();
 
         // Create the timer
         timer = new Timer("Timer Daemon", true);
 
         // Calculate the total duration of the sequence
-        long subDuration = 1L;
+        long subDurations = 1L;
         for (Interval interval: intervalArray) {
-            subDuration += interval.getDuration();
+            subDurations += interval.getDuration();
         }
-        totalDuration = subDuration;
+        totalDuration = subDurations;
     }
 
     // *** Value Method(s)
@@ -153,16 +150,16 @@ public class SequenceTimer {
         long accruedDuration = 1L;
         for (int intervalIndex = 0; intervalIndex < intervalArray.length; intervalIndex++) {
             if (intervalIndex == 0) { // First interval (uses main sound)
-                soundPath = Sound.getPathFromSoundList(sequence.getMainSound());
+                soundPath = Sound.getPathFromSoundList(sequence.getMainSoundName());
 
                 // "Start" the object's internal status clock
                 this.setStartTime();
                 // Let any threads know that the Timer has scheduled tasks
                 this.isTimerRunning = true;
             } else if (intervalIndex == intervalArray.length - 1) { // Last interval (uses main sound)
-                soundPath = Sound.getPathFromSoundList(sequence.getMainSound());
+                soundPath = Sound.getPathFromSoundList(sequence.getMainSoundName());
             } else { // Middle intervals (use secondary sound)
-                soundPath = Sound.getPathFromSoundList(sequence.getIntervalSound());
+                soundPath = Sound.getPathFromSoundList(sequence.getSecondarySoundName());
             }
 
             try {
@@ -187,7 +184,9 @@ public class SequenceTimer {
      * Pauses the timer
      */
     public void pauseTimer() {
-        long timerStatus = getElapsedTime();
+        // Get the time
+        long timerPassed = getElapsedTime();
+        long timeLeft = getTotalDuration() - getElapsedTime();
 
         // Kill the timer and all related threads
         timer.cancel();

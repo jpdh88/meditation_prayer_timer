@@ -63,11 +63,11 @@ public class InterfaceCommandLine {
         int soundNum = 1; // Give each array item a number
         String getFormattedSoundList = "";
         for (String soundName: soundList) {
-            if (soundName == userSequence.getMainSound() && soundName == userSequence.getIntervalSound()) {
+            if (soundName == userSequence.getMainSoundName() && soundName == userSequence.getSecondarySoundName()) {
                 getFormattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Main and Interval Sound)" + "\n";
-            } else if (soundName == userSequence.getMainSound()) {
+            } else if (soundName == userSequence.getMainSoundName()) {
                 getFormattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Main Sound)" + "\n";
-            } else if (soundName == userSequence.getIntervalSound()) {
+            } else if (soundName == userSequence.getSecondarySoundName()) {
                 getFormattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + " (Current Interval Sound)" + "\n";
             } else {
                 getFormattedSoundList += "\t" + String.format("%2d", soundNum) + ") " + soundName + "\n";
@@ -93,7 +93,7 @@ public class InterfaceCommandLine {
         System.out.println("\t 0) Exit");
 
         // Selection loop
-        String soundName = userSequence.getMainSound(); // initialize the choice with the current soundName
+        String soundName = userSequence.getMainSoundName(); // initialize the choice with the current soundName
         boolean doneCase6 = false;
         while (!doneCase6) {
             System.out.println(prompt("Which sound do you want as the " + soundType + "?", 3));
@@ -120,7 +120,7 @@ public class InterfaceCommandLine {
         boolean doneLvl2 = false;
         while (!doneLvl2) {
             System.out.println("+--------------------------------------------------");
-            System.out.println(userSequence.printSequenceLine());
+            System.out.println(userSequence.getSequenceLine());
             System.out.println("+--------------------------------------------------");
             System.out.println(prompt("What would you like to do?", 2));
             System.out.println("\t1) ADD an Interval to the end");
@@ -276,7 +276,7 @@ public class InterfaceCommandLine {
                     userSequence.setMainSound(selectSound(("Main Sound")));
                     break;
                 case 7: // CHANGE the secondary sound
-                    userSequence.setMainSound(selectSound(("Secondary Sound")));
+                    userSequence.setSecondarySound(selectSound(("Secondary Sound")));
                     break;
                 case 8: // PLAY a sound
                     String[] soundList = Sound.getSoundList();
@@ -337,7 +337,7 @@ public class InterfaceCommandLine {
                     break;
                 case 1:
                     System.out.println("+--------------------------------------------------");
-                    System.out.println(userSequence.printSequenceLine());
+                    System.out.println(userSequence.getSequenceLine());
                     System.out.println("+--------------------------------------------------");
                     break;
                 case 2:

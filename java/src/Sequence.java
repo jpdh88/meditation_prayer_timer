@@ -14,7 +14,7 @@ import java.util.Set;
 public class Sequence {
     // VARIABLES
     /** Array of Intervals **/
-    private ArrayList<Interval> subSequenceArray = new ArrayList<>();
+    private ArrayList<Interval> intervalArrayList = new ArrayList<>();
     /** Sound Object for first and last Intervals (the "Main" Intervals) **/
     private static Sound mainSound;
     /** Sound Object for intervening Intervals **/
@@ -26,8 +26,8 @@ public class Sequence {
      * Empty constructor: Creates the default Sequence (just first and last Intervals)
      */
     public Sequence() {
-        subSequenceArray.add( new Interval(1800, true));
-        subSequenceArray.add( new Interval(0, true));
+        intervalArrayList.add( new Interval(1800, true));
+        intervalArrayList.add( new Interval(0, true));
         mainSound = new Sound(true);
         intervalSound = new Sound(false);
     }
@@ -38,7 +38,7 @@ public class Sequence {
      * Gets the sound associated with the Main Intervals (the first and last Intervals)
      * @return The name of the sound that will be played
      */
-    public String getMainSound() {
+    public String getMainSoundName() {
         return mainSound.getSoundName();
     }
 
@@ -51,27 +51,28 @@ public class Sequence {
     }
 
     /**
-     * Gets the sound associated with the Interval Intervals
+     * Gets the sound associated with the Secondary Intervals
      * @return The name of the sound that will be played
      */
-    public String getIntervalSound() {
+    public String getSecondarySoundName() {
         return intervalSound.getSoundName();
     }
 
     /**
-     * Sets the sound name associated with the Interval Intervals
+     * Sets the sound name associated with the Secondary Intervals
      * @param soundName The name of the sound (must be in the Sound.soundList)
      */
-    public void setIntervalSound(String soundName) {
+    public void setSecondarySound(String soundName) {
         intervalSound.setSound(soundName);
     }
 
     /**
      * Get the IntervalArray
-     * @return The subSequenceArray
+     * @return The intervalArrayList
      */
-    public ArrayList getSequenceArray() {
-        return subSequenceArray;
+    public Interval[] getSequenceArray() {
+        Interval[] intervalArray = intervalArrayList.toArray(new Interval[intervalArrayList.size()]);
+        return intervalArray;
     }
 
     /**
@@ -79,17 +80,17 @@ public class Sequence {
      * @return The number of Intervals in the array
      */
     public int getNumIntervals() {
-        return subSequenceArray.size();
+        return intervalArrayList.size();
     }
 
     // *** Manipulation methods
     /**
-     * Creates a new Interval and inserts it at index location in subSequenceArray
-     * @param index The location in subSequenceArray Where the new Interval is to be added
+     * Creates a new Interval and inserts it at index location in intervalArrayList
+     * @param index The location in intervalArrayList Where the new Interval is to be added
      * @param duration The length of the new Interval
      */
     public void addInterval(int duration, int index) {
-        subSequenceArray.add(index, new Interval(duration, false));
+        intervalArrayList.add(index, new Interval(duration, false));
     }
     /**
      * Creates a new Interval and inserts it into the second-to-last spot
@@ -97,25 +98,25 @@ public class Sequence {
      */
     public void addInterval(int duration) {
         if (duration >= 0) {
-            this.addInterval(duration, subSequenceArray.size() - 1);
+            this.addInterval(duration, intervalArrayList.size() - 1);
         } else {
             System.out.println("Sequence Class Error: Duration must be a positive integer.");
         }
     }
 
     /**
-     * Edit the duration of a particular Interval in the subSequenceArray
+     * Edit the duration of a particular Interval in the intervalArrayList
      *  - The last Interval in the array cannot be changed
-     * @param index The index of the Subsequence in subSequenceArray that is being being edited
+     * @param index The index of the Subsequence in intervalArrayList that is being being edited
      * @param newDuration The new duration of the Interval
      */
     public void editInterval (int index, int newDuration) {
-        if (index == subSequenceArray.size() - 1) {
+        if (index == intervalArrayList.size() - 1) {
             System.out.println("Sequence Class Error: You can't edit that one.");
-        } else if (index < 0 || index >= subSequenceArray.size()){
+        } else if (index < 0 || index >= intervalArrayList.size()){
             System.out.println("Sequence Class Error: Index out of range.");
         } else {
-            subSequenceArray.get(index).setDuration(newDuration);
+            intervalArrayList.get(index).setDuration(newDuration);
         }
     }
 
@@ -126,30 +127,30 @@ public class Sequence {
      */
     public void swapIntervals (int index1, int index2) {
         if (    index1 == 0 ||
-                index1 == subSequenceArray.size() - 1 ||
+                index1 == intervalArrayList.size() - 1 ||
                 index2 == 0 ||
-                index2 == subSequenceArray.size() - 1 ) {
+                index2 == intervalArrayList.size() - 1 ) {
             System.out.println("Sequence Class Error: You can't use swap with the first or last Interval.");
-        } else if ( index1 >= subSequenceArray.size() ||
-                    index2 >= subSequenceArray.size() ) {
+        } else if ( index1 >= intervalArrayList.size() ||
+                    index2 >= intervalArrayList.size() ) {
             System.out.println("Sequence Class Error: One or more indexes are out of range.");
         } else {
-            Collections.swap(subSequenceArray, index1, index2);
+            Collections.swap(intervalArrayList, index1, index2);
         }
     }
 
     /**
-     * Deletes an Interval from the subSequenceArray
+     * Deletes an Interval from the intervalArrayList
      *  - The first or last Interval cannot be deleted
-     * @param subSequence The index of the Subsequence in subSequenceArray that is being being removed
+     * @param interval The index of the Subsequence in intervalArrayList that is being being removed
      */
-    public void deleteInterval(int subSequence) {
-        if (subSequence < 0 || subSequence >= subSequenceArray.size()) {
+    public void deleteInterval(int interval) {
+        if (interval < 0 || interval >= intervalArrayList.size()) {
             System.out.println("Sequence Class Error: Index out of range.");
-        } else if (subSequence == 0 || (subSequence == subSequenceArray.size() - 1)){
+        } else if (interval == 0 || (interval == intervalArrayList.size() - 1)){
             System.out.println("Sequence Class Error: You can't remove the first or last Interval.");
         } else {
-            subSequenceArray.remove(subSequence);
+            intervalArrayList.remove(interval);
         }
 
     }
@@ -159,16 +160,16 @@ public class Sequence {
      * Returns a visual representation of a Sequence object in a String
      * @return Visual representation of the Sequence (in String form)
      */
-    public String printSequenceLine () {
+    public String getSequenceLine () {
         String line1 = "| Your session:\t\t";
         String line2 = "| Interval #:\t\t";
         /** ArrayList of Interval objects **/
-        ArrayList<Interval> subSequenceArrayList = new ArrayList<>(this.getSequenceArray());
+        // ArrayList<Interval> intervalArrayListList = new ArrayList<>(this.getSequenceArray());
         /** Convert ArrayList into an Array **/
-        Interval[] subSequenceArray = subSequenceArrayList.toArray(new Interval[subSequenceArrayList.size()]);
+        Interval[] intervalArray = intervalArrayList.toArray(new Interval[intervalArrayList.size()]);
 
         int counter = 1;
-        for (Interval subSequence: subSequenceArray) { // iterate through each member of the array
+        for (Interval subSequence: intervalArrayList) { // iterate through each member of the array
             int duration = subSequence.getDuration(); // the Interval's duration
             String dashes = new String(new char[(duration / 60)]).replace("\0", "-");
             String spaces = new String(new char[(duration / 60)]).replace("\0", " ");
@@ -194,7 +195,7 @@ public class Sequence {
     @Override
     public String toString() {
         String output = "Sequence Object:";
-        for (Interval item: subSequenceArray) {
+        for (Interval item: intervalArrayList) {
             output += "\n - " + item;
         }
         return output;

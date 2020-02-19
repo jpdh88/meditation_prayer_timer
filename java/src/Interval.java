@@ -40,14 +40,6 @@ public class Interval {
     }
 
     /**
-     * Sets whether this Interval is a first or last / Main Interval
-     * @param isFirstOrLast whether this Interval is a Main Interval or not
-     */
-    public void setIsFirstOrLast(boolean isFirstOrLast) {
-        this.isFirstOrLast = isFirstOrLast;
-    }
-
-    /**
      * Gets whether this Interval is a first or last / Main Interval
      * @return whether this Interval is a Main Interval
      */
