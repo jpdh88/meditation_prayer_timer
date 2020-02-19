@@ -7,7 +7,7 @@ public class Interval {
     /** Whether the Interval is first or last ( = True), or not ( = False) */
     private boolean isFirstOrLast;
     /** Duration of the Interval */
-    private int duration; // in seconds
+    private int duration; // in milliseconds
 
     // METHODS
     // *** Constructors
@@ -24,7 +24,7 @@ public class Interval {
     /**
      * Set the duration
      *
-     * @param duration Duration of the sequence in seconds
+     * @param duration Duration of the sequence in milliseconds
      */
     public void setDuration(int duration) {
         this.duration = duration;
@@ -33,7 +33,7 @@ public class Interval {
     /**
      * Get the duration
      *
-     * @return Duration of the sound in seconds
+     * @return Duration of the sound in milliseconds
      */
     public int getDuration() {
         return duration;
