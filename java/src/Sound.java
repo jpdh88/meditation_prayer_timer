@@ -25,7 +25,7 @@ public class Sound {
     /** The AudioFormat object of the chosen sound **/
     private AudioFormat soundStreamFormat; // for getting information about the sound file
     /** length of a sound clip **/
-    public static final int CLIP_DURATION = 15; // in seconds
+    public static final int CLIP_DURATION = 15000; // in milliseconds
 
 
     // METHODS
@@ -216,13 +216,13 @@ public class Sound {
 
     /**
      * Gets the duration of the chosen sound
-     * @return Duration of the sound in seconds
+     * @return Duration of the sound in milliseconds
      */
     public double getSoundDuration() {
         long frames = soundStream.getFrameLength();
         double soundDuration = (frames+0.0) / soundStreamFormat.getFrameRate();
 
-        return soundDuration;
+        return soundDuration * 1000;
     }
 
     // *** Utility Methods
