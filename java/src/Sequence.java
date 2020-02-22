@@ -24,9 +24,10 @@ public class Sequence {
     // *** Constructors
     /**
      * Empty constructor: Creates the default Sequence (just first and last Intervals)
+     *  Time format: 15m * 60s * 1000ms = 15m
      */
     public Sequence() {
-        intervalArrayList.add( new Interval(1800, true));
+        intervalArrayList.add( new Interval(15*60*1000, true));
         intervalArrayList.add( new Interval(0, true));
         mainSound = new Sound(true);
         intervalSound = new Sound(false);
