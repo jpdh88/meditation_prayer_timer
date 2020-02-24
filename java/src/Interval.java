@@ -7,14 +7,14 @@ public class Interval {
     /** Whether the Interval is first or last ( = True), or not ( = False) */
     private boolean isFirstOrLast;
     /** Duration of the Interval */
-    private int duration; // in milliseconds
+    private long duration; // in milliseconds
 
     // METHODS
     // *** Constructors
     /**
      * Constructor: Used to create Intervals
      */
-    public Interval(int duration, boolean isFirstOrLast) {
+    public Interval(long duration, boolean isFirstOrLast) {
         this.isFirstOrLast = isFirstOrLast;
         this.duration = duration;
     }
@@ -26,7 +26,7 @@ public class Interval {
      *
      * @param duration Duration of the sequence in milliseconds
      */
-    public void setDuration(int duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
@@ -35,7 +35,7 @@ public class Interval {
      *
      * @return Duration of the sound in milliseconds
      */
-    public int getDuration() {
+    public long getDuration() {
         return duration;
     }
 
