@@ -171,9 +171,9 @@ public class Sequence {
 
         int counter = 1;
         for (Interval interval: intervalArrayList) { // iterate through each member of the array
-            int duration = interval.getDuration() / 1000; // the Interval's duration in seconds
-            String dashes = new String(new char[(duration / 60)]).replace("\0", "-");
-            String spaces = new String(new char[(duration / 60)]).replace("\0", " ");
+            long duration = interval.getDuration() / 1000; // the Interval's duration in seconds
+            String dashes = new String(new char[((int)duration / 60)]).replace("\0", "-");
+            String spaces = new String(new char[((int)duration / 60)]).replace("\0", " ");
 
             // distinguish main sounds from interval sounds
             if (interval.getIsFirstOrLast()) {

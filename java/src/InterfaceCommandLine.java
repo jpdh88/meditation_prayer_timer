@@ -325,7 +325,7 @@ public class InterfaceCommandLine {
             System.out.println(prompt("What would you like to do?", 1));
             System.out.println("\t1) See my session");
             System.out.println("\t2) Edit session details");
-            System.out.println("\t3) Start my session (not done)");
+            System.out.println("\t3) Start my session (incomplete)");
             System.out.println("\t4) Save my session (not done)");
             System.out.println("\t5) Load a session (not done)");
             System.out.println("\t---");
@@ -343,6 +343,58 @@ public class InterfaceCommandLine {
                     break;
                 case 2:
                     editSequence();
+                    break;
+                case 3:
+                    // Instructions to user
+                    System.out.println("Session starting...");
+                    System.out.println(prompt("Session options:", 2));
+                    System.out.println("\t1) Pause session");
+                    System.out.println("\t2) Restart session (doesn't work)");
+                    System.out.println("\t---");
+                    System.out.println("\t0) End timer and exit session");
+
+                    // Start the timer
+                    SequenceTimer sequenceTimer = new SequenceTimer(userSequence);
+                    sequenceTimer.run();
+
+                    // Conditions to exit the while loop:
+                    //  - on user choice
+                    //  - if both timer is not running AND timer is not paused
+                    boolean doneSession = false;
+                    while ( (sequenceTimer.getIsTimerRunning() || sequenceTimer.getIsTimerPaused()) && !doneSession ) {
+                        Scanner keybIn = new Scanner(System.in);
+                        String userInput = keybIn.nextLine();
+
+                        if (userInput.equals("0")) { // exit condition is met
+                            sequenceTimer.endTimer();
+                            doneSession = true;
+                        } else if (userInput.equals("1")) {
+                            sequenceTimer.pauseTimer();
+                            while (true) {
+                                System.out.println(prompt("Session paused. What would you like to do?", 3));
+                                System.out.println("\t1) Restart timer from current location (doesn't work!!)");
+                                System.out.println("\t2) Restart timer from beginning (doesn't work!!)");
+                                System.out.println("\t---");
+                                System.out.println("\t0) Quit");
+                                userInput = keybIn.nextLine();
+                                if (userInput.equals("1")) {
+                                    sequenceTimer.restartTimer();
+                                    break;
+                                } else if (userInput.equals("2")) {
+                                    sequenceTimer.restartTimerBeginning();
+                                    break;
+                                } else if (userInput.equals("0")) {
+                                    doneSession = true;
+                                    break;
+                                } else {
+                                    System.out.println(errorMsg("Invalid input. Please enter a valid choice."));
+                                }
+                            }
+                        } else if (userInput.equals("a")) {
+                            System.out.println(sequenceTimer.getElapsedTime());
+                        }
+                    }
+                    break;
                 default:
                     System.out.println("[- Invalid choice.]");
             }
