@@ -158,38 +158,6 @@ public class Sequence {
 
     // *** Utility methods
     /**
-     * Returns a visual representation of a Sequence object in a String
-     * @return Visual representation of the Sequence (in String form)
-     */
-    public String getSequenceLine () {
-        String line1 = "| Your session:\t\t";
-        String line2 = "| Interval #:\t\t";
-        /** ArrayList of Interval objects **/
-        // ArrayList<Interval> intervalArrayListList = new ArrayList<>(this.getSequenceArray());
-        /** Convert ArrayList into an Array **/
-        Interval[] intervalArray = intervalArrayList.toArray(new Interval[intervalArrayList.size()]);
-
-        int counter = 1;
-        for (Interval interval: intervalArrayList) { // iterate through each member of the array
-            long duration = interval.getDuration() / 1000; // the Interval's duration in seconds
-            String dashes = new String(new char[((int)duration / 60)]).replace("\0", "-");
-            String spaces = new String(new char[((int)duration / 60)]).replace("\0", " ");
-
-            // distinguish main sounds from interval sounds
-            if (interval.getIsFirstOrLast()) {
-                line1 += "O" + dashes;
-            } else{
-                line1 += "o" + dashes;
-            }
-            line2 += counter + spaces;
-
-            counter++;
-
-        }
-        return line1 + "\n" + line2;
-    }
-
-    /**
      * toString method
      * @return Returns a String of the Object's variables
      */

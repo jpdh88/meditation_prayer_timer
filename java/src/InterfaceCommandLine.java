@@ -7,13 +7,18 @@ import java.util.Scanner;
  * @author Joseph Haley
  */
 public class InterfaceCommandLine {
-    // The default Sequence
+    // VARIABLES
+    /** The default Sequence **/
     private static Sequence userSequence = new Sequence();
-    // For user input with the keyboard
+    /** For user input with the keyboard **/
     private static Scanner keybIn = new Scanner(System.in);
-    // Minimum length of an Interval
+    /** Minimum length of an Interval **/
     private static int minIntervalLength = 30; // in seconds
 
+    // METHODS
+    // *** Variable Method(s)
+
+    // *** Utility/Helper Method(s)
     /**
      * Method for error messages: ensures a consistent format for error messages
      * @param message The error message to be displayed to the user
@@ -80,6 +85,38 @@ public class InterfaceCommandLine {
     }
 
     /**
+     * Returns a visual representation of a Sequence object in a String
+     * @return Visual representation of the Sequence (in String form)
+     */
+    public static String getSequenceLine () {
+        String line1 = "| Your session:\t\t";
+        String line2 = "| Interval #:\t\t";
+        /** ArrayList of Interval objects **/
+        // ArrayList<Interval> intervalArrayListList = new ArrayList<>(this.getSequenceArray());
+        /** Convert ArrayList into an Array **/
+        Interval[] intervalArray = userSequence.getSequenceArray();
+
+        int counter = 1;
+        for (Interval interval: intervalArray) { // iterate through each member of the array
+            long duration = interval.getDuration() / 1000; // the Interval's duration in seconds
+            String dashes = new String(new char[((int)duration / 60)]).replace("\0", "-");
+            String spaces = new String(new char[((int)duration / 60)]).replace("\0", " ");
+
+            // distinguish main sounds from interval sounds
+            if (interval.getIsFirstOrLast()) {
+                line1 += "O" + dashes;
+            } else{
+                line1 += "o" + dashes;
+            }
+            line2 += counter + spaces;
+
+            counter++;
+
+        }
+        return line1 + "\n" + line2;
+    }
+
+    /**
      * Method for helping with selection of Main or Interval sound (using this saves having to duplicate the loop)
      * @param soundType Either "Main Sound" or "Interval Sound"
      * @return The name of the sound chosen
@@ -121,7 +158,7 @@ public class InterfaceCommandLine {
         boolean doneLvl2 = false;
         while (!doneLvl2) {
             System.out.println("+--------------------------------------------------");
-            System.out.println(userSequence.getSequenceLine());
+            System.out.println(getSequenceLine());
             System.out.println("+--------------------------------------------------");
             System.out.println(prompt("What would you like to do?", 2));
             System.out.println("\t1) ADD an Interval to the end");
@@ -338,7 +375,7 @@ public class InterfaceCommandLine {
                     break;
                 case 1:
                     System.out.println("+--------------------------------------------------");
-                    System.out.println(userSequence.getSequenceLine());
+                    System.out.println(getSequenceLine());
                     System.out.println("+--------------------------------------------------");
                     break;
                 case 2:
