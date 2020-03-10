@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -15,8 +16,128 @@ public class InterfaceCommandLine {
     /** Minimum length of an Interval **/
     private static int minIntervalLength = 30; // in seconds
 
+    /** The timer object which will run the session **/
+    private SequenceTimer sequenceTimer;
+
+    // *** Variables for the Timer status indicator
+    /** The status bar output **/
+    int numCharColumns = 100; // number of characters for the status bar
+    String[] statusArray = new String[numCharColumns];
+
     // METHODS
     // *** Variable Method(s)
+
+    // *** Indicator bar method(s)
+    /**
+     * Returns a visual representation of a Sequence object in a String
+     * @return Visual representation of the Sequence (in String form)
+     */
+    public static String getSequenceLine () {
+        String line1 = "| Your session:\t\t";
+        String line2 = "| Interval #:\t\t";
+        /** ArrayList of Interval objects **/
+        // ArrayList<Interval> intervalArrayListList = new ArrayList<>(this.getSequenceArray());
+        /** Convert ArrayList into an Array **/
+        Interval[] intervalArray = userSequence.getSequenceArray();
+
+        int counter = 1;
+        for (Interval interval: intervalArray) { // iterate through each member of the array
+            long duration = interval.getDuration() / 1000; // the Interval's duration in seconds
+            String dashes = new String(new char[((int)duration / 60)]).replace("\0", "-");
+            String spaces = new String(new char[((int)duration / 60)]).replace("\0", " ");
+
+            // distinguish main sounds from interval sounds
+            if (interval.getIsFirstOrLast()) {
+                line1 += "O" + dashes;
+            } else{
+                line1 += "o" + dashes;
+            }
+            line2 += counter + spaces;
+
+            counter++;
+
+        }
+        return line1 + "\n" + line2;
+    }
+
+    /**
+     * Prints a status indicator to the terminal screen.
+     * @param statusArray A representation in characters of how much of the timer has already occurred
+     * @param currentDuration How far along the process is (i.e. the iteration the loop is on)
+     * @param totalDuration How long the process is (i.e. the total number of iterations in the loop)
+     * @param hasSoundTriggered Whether a sound has been triggered or not: this is significant--refer to code
+     * @return The reformulated statusArray (so it can be re-used
+     *
+     * TODO:
+     *  - clean up: this is sloppy
+     */
+    public static String[] statusIndicator (String[] statusArray, double currentDuration, double totalDuration, boolean hasSoundTriggered) {
+        String[] newStatusArray = Arrays.copyOf(statusArray, statusArray.length);
+
+        // The number of chars in the array will determine our 100% point
+        int presentIndex = (int) (currentDuration / totalDuration * statusArray.length);
+
+        String backItUp = ""; // string for building the cursor-backer-upper
+        String indicator = ""; // string for building the status bar
+
+        // Only change the array if we need to over-write the character at our present index
+        if (presentIndex < statusArray.length - 1) {
+            if (statusArray[presentIndex] == " " || statusArray[presentIndex] == null) {
+                for (int chr = presentIndex; chr < statusArray.length; chr++) {
+                    if (chr == presentIndex) {
+                        if (hasSoundTriggered) { // a sound has played
+                            newStatusArray[chr] = "O";
+                            // SequenceTimer.setHasSoundTriggered(false); // reset hasSoundTriggered boolean flag
+                        } else { // time has passed
+                            newStatusArray[chr] = "-";
+                        }
+                    } else { // indicate time has not passed yet
+                        newStatusArray[chr] = " ";
+                    }
+                }
+            }
+        } else if (presentIndex == statusArray.length - 1) { // final sound
+            newStatusArray[statusArray.length - 1] = "O";
+            // SequenceTimer.setHasSoundTriggered(false);
+        }
+
+        // We need as many backspace characters as are printed to ensure that our status indicator remains in the same
+        //  place: charColumns + whatever characters are added to the output
+        if (currentDuration != 1) { // we don't need backup characters on the first iteration
+            for (int chr = 1; chr <= statusArray.length + 29; chr++) {
+                backItUp += "\b";
+            }
+        }
+
+        // Create status indicator string from the array
+        for (String item : newStatusArray) {
+            indicator += item;
+        }
+
+        // Output backup characters and indicator string w/ a percentage
+//        int percentage = (int)((double)presentIndex / (double)statusArray.length * 100);
+//        if (percentage <= 100) {
+//            System.out.print(backItUp); // backup the cursor to the starting point
+//            System.out.print("[" + indicator + "] " + String.format("%3d", percentage) + "%\n");
+//        }
+
+        int totalDurSecs = (int)(totalDuration / 1000);
+        int totalDurOnlyMins = totalDurSecs / 60;
+        int totalDurOnlySecs = totalDurSecs % 60;
+
+        int currentDurSecs = (int)(currentDuration / 1000);
+        int currentDurOnlyMins = currentDurSecs / 60;
+        int currentDurOnlySecs = currentDurSecs % 60;
+
+        if (currentDuration <= totalDuration) {
+            System.out.print(backItUp); // backup the cursor to the starting point
+            System.out.print("Status: [" + indicator + "] " + String.format("%3d", currentDurOnlyMins) + "m" + String.format("%2d", currentDurOnlySecs) + "s" +
+                    " / " + String.format("%3d", totalDurOnlyMins) + "m" + totalDurOnlySecs + "s");
+        }
+
+        // Return the array so it can be reused
+        return newStatusArray;
+    }
 
     // *** Utility/Helper Method(s)
     /**
@@ -82,38 +203,6 @@ public class InterfaceCommandLine {
         }
 
         return getFormattedSoundList;
-    }
-
-    /**
-     * Returns a visual representation of a Sequence object in a String
-     * @return Visual representation of the Sequence (in String form)
-     */
-    public static String getSequenceLine () {
-        String line1 = "| Your session:\t\t";
-        String line2 = "| Interval #:\t\t";
-        /** ArrayList of Interval objects **/
-        // ArrayList<Interval> intervalArrayListList = new ArrayList<>(this.getSequenceArray());
-        /** Convert ArrayList into an Array **/
-        Interval[] intervalArray = userSequence.getSequenceArray();
-
-        int counter = 1;
-        for (Interval interval: intervalArray) { // iterate through each member of the array
-            long duration = interval.getDuration() / 1000; // the Interval's duration in seconds
-            String dashes = new String(new char[((int)duration / 60)]).replace("\0", "-");
-            String spaces = new String(new char[((int)duration / 60)]).replace("\0", " ");
-
-            // distinguish main sounds from interval sounds
-            if (interval.getIsFirstOrLast()) {
-                line1 += "O" + dashes;
-            } else{
-                line1 += "o" + dashes;
-            }
-            line2 += counter + spaces;
-
-            counter++;
-
-        }
-        return line1 + "\n" + line2;
     }
 
     /**
@@ -392,45 +481,45 @@ public class InterfaceCommandLine {
 
                     // Start the timer
                     SequenceTimer sequenceTimer = new SequenceTimer(userSequence);
-                    sequenceTimer.run();
+
 
                     // Conditions to exit the while loop:
                     //  - on user choice
                     //  - if both timer is not running AND timer is not paused
-                    boolean doneSession = false;
-                    while ( (sequenceTimer.getIsTimerRunning() || sequenceTimer.getIsTimerPaused()) && !doneSession ) {
-                        Scanner keybIn = new Scanner(System.in);
-                        String userInput = keybIn.nextLine();
-
-                        if (userInput.equals("0")) { // exit condition is met
-                            sequenceTimer.endTimer();
-                            doneSession = true;
-                        } else if (userInput.equals("1")) {
-                            sequenceTimer.pauseTimer();
-                            while (true) {
-                                System.out.println(prompt("Session paused. What would you like to do?", 3));
-                                System.out.println("\t1) Restart timer from current location (doesn't work!!)");
-                                System.out.println("\t2) Restart timer from beginning (doesn't work!!)");
-                                System.out.println("\t---");
-                                System.out.println("\t0) Quit");
-                                userInput = keybIn.nextLine();
-                                if (userInput.equals("1")) {
-                                    sequenceTimer.restartTimer();
-                                    break;
-                                } else if (userInput.equals("2")) {
-                                    sequenceTimer.restartTimerBeginning();
-                                    break;
-                                } else if (userInput.equals("0")) {
-                                    doneSession = true;
-                                    break;
-                                } else {
-                                    System.out.println(errorMsg("Invalid input. Please enter a valid choice."));
-                                }
-                            }
-                        } else if (userInput.equals("a")) {
-                            System.out.println(sequenceTimer.getElapsedTime());
-                        }
-                    }
+//                    boolean doneSession = false;
+//                    while ( (sequenceTimer.getIsTimerRunning() || sequenceTimer.getIsTimerPaused()) && !doneSession ) {
+//                        Scanner keybIn = new Scanner(System.in);
+//                        String userInput = keybIn.nextLine();
+//
+//                        if (userInput.equals("0")) { // exit condition is met
+//                            sequenceTimer.endTimer();
+//                            doneSession = true;
+//                        } else if (userInput.equals("1")) {
+//                            sequenceTimer.pauseTimer();
+//                            while (true) {
+//                                System.out.println(prompt("Session paused. What would you like to do?", 3));
+//                                System.out.println("\t1) Restart timer from current location (doesn't work!!)");
+//                                System.out.println("\t2) Restart timer from beginning (doesn't work!!)");
+//                                System.out.println("\t---");
+//                                System.out.println("\t0) Quit");
+//                                userInput = keybIn.nextLine();
+//                                if (userInput.equals("1")) {
+//                                    sequenceTimer.restartTimer();
+//                                    break;
+//                                } else if (userInput.equals("2")) {
+//                                    sequenceTimer.restartTimerBeginning();
+//                                    break;
+//                                } else if (userInput.equals("0")) {
+//                                    doneSession = true;
+//                                    break;
+//                                } else {
+//                                    System.out.println(errorMsg("Invalid input. Please enter a valid choice."));
+//                                }
+//                            }
+//                        } else if (userInput.equals("a")) {
+//                            System.out.println(sequenceTimer.getElapsedTime());
+//                        }
+//                    }
                     break;
                 default:
                     System.out.println("[- Invalid choice.]");

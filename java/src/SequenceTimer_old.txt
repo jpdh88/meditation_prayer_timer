@@ -61,13 +61,13 @@ class SoundTask extends TimerTask {
  *  -) ensure that when Timer tasks are finished the while loop checking for user input also ends
  *      - put the while loop in its own thread?
  */
-public class SequenceTimer {
+public class SequenceTimer_old {
     // VARIABLES
     /** The time when the first SoundTask is assigned to the Timer--effectively, this is the start time of the Timer **/
     private long startTime; // in milliseconds
     /** The total duration that the Timer will run for **/
     private long totalDuration; // in milliseconds
-    private final long totalDurationBackup; // in milliseconds
+    // private final long totalDurationBackup; // in milliseconds
 
     /** The Sequence that will be parsed into tasks and then passed to the timer to be run **/
     private Sequence sequence;
