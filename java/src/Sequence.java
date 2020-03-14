@@ -27,7 +27,7 @@ public class Sequence {
      *  Time format: 15m * 60s * 1000ms = 15m
      */
     public Sequence() {
-        intervalArrayList.add( new Interval(15*60*1000, true));
+        intervalArrayList.add( new Interval(15, true));
         intervalArrayList.add( new Interval(0, true));
         mainSound = new Sound(true);
         intervalSound = new Sound(false);
@@ -86,16 +86,16 @@ public class Sequence {
     /**
      * Creates a new Interval object and inserts it at index location in intervalArrayList
      * @param index The location in intervalArrayList where the new Interval object is to be added
-     * @param duration The length of the new Interval object in milliseconds
+     * @param duration The length of the new Interval object in minutes
      */
-    public void addInterval(int duration, int index) {
+    public void addInterval(double duration, int index) {
         intervalArrayList.add(index, new Interval(duration, false));
     }
     /**
      * Creates a new Interval object and inserts it at the second-to-last spot
-     * @param duration The duration of the new Interval in milliseconds
+     * @param duration The duration of the new Interval in minutes
      */
-    public void addInterval(int duration) {
+    public void addInterval(double duration) {
         if (duration >= 0) {
             this.addInterval(duration, intervalArrayList.size() - 1);
         } else {
