@@ -21,7 +21,7 @@ public class Sequence {
     private static Sound intervalSound;
 
     // METHODS
-    // *** Constructors
+    // *** Constructor(s)
     /**
      * Empty constructor: Creates the default Sequence (just first and last Intervals)
      *  Time format: 15m * 60s * 1000ms = 15m
@@ -33,8 +33,7 @@ public class Sequence {
         intervalSound = new Sound(false);
     }
 
-    // *** Values methods
-
+    // *** Variable method(s)
     /**
      * Gets the sound associated with the Main Intervals (the first and last Intervals)
      * @return The name of the sound that will be played
@@ -68,33 +67,32 @@ public class Sequence {
     }
 
     /**
-     * Get the IntervalArray
-     * @return The intervalArrayList
+     * Get an ordered array of Interval objects (an ARRAY, not an array list)
+     * @return The ordered array of Interval objects
      */
     public Interval[] getSequenceArray() {
-        Interval[] intervalArray = intervalArrayList.toArray(new Interval[intervalArrayList.size()]);
-        return intervalArray;
+        return intervalArrayList.toArray(new Interval[intervalArrayList.size()]);
     }
 
     /**
-     * Get the number of Intervals in the array
-     * @return The number of Intervals in the array
+     * Get the number of Interval objects in the array
+     * @return The number of Interval objects in the array
      */
     public int getNumIntervals() {
         return intervalArrayList.size();
     }
 
-    // *** Manipulation methods
+    // *** Manipulation method(s)
     /**
-     * Creates a new Interval and inserts it at index location in intervalArrayList
-     * @param index The location in intervalArrayList Where the new Interval is to be added
-     * @param duration The length of the new Interval in milliseconds
+     * Creates a new Interval object and inserts it at index location in intervalArrayList
+     * @param index The location in intervalArrayList where the new Interval object is to be added
+     * @param duration The length of the new Interval object in milliseconds
      */
     public void addInterval(int duration, int index) {
         intervalArrayList.add(index, new Interval(duration, false));
     }
     /**
-     * Creates a new Interval and inserts it into the second-to-last spot
+     * Creates a new Interval object and inserts it at the second-to-last spot
      * @param duration The duration of the new Interval in milliseconds
      */
     public void addInterval(int duration) {
@@ -122,9 +120,9 @@ public class Sequence {
     }
 
     /**
-     * Swap two Intervals' positions
-     * @param index1 One of the Intervals to be swapped
-     * @param index2 One of the Intervals to be swapped
+     * Swap two Interval objects' positions
+     * @param index1 One of the Interval objects to be swapped
+     * @param index2 The other Interval object to be swapped
      */
     public void swapIntervals (int index1, int index2) {
         if (    index1 == 0 ||
@@ -141,9 +139,9 @@ public class Sequence {
     }
 
     /**
-     * Deletes an Interval from the intervalArrayList
-     *  - The first or last Interval cannot be deleted
-     * @param interval The index of the Subsequence in intervalArrayList that is being being removed
+     * Deletes an Interval object from the intervalArrayList
+     *  - The first or last Interval object cannot be deleted
+     * @param interval The index of the Interval object in intervalArrayList that is being being removed
      */
     public void deleteInterval(int interval) {
         if (interval < 0 || interval >= intervalArrayList.size()) {
@@ -156,11 +154,12 @@ public class Sequence {
 
     }
 
-    // *** Utility methods
+    // *** Utility method()
     /**
      * toString method
      * @return Returns a String of the Object's variables
      */
+
     @Override
     public String toString() {
         String output = "Sequence Object:";
