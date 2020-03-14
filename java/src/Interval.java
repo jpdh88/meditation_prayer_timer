@@ -20,7 +20,6 @@ public class Interval {
     }
 
     // *** Variable methods
-
     /**
      * Set the duration
      *
@@ -48,10 +47,16 @@ public class Interval {
     }
 
     // *** Utility methods
+    /**
+     * Gets a string representation of the Interval object
+     * @return a string representation of the Interval object
+     */
     @Override
     public String toString() {
-        return  "dur: " + String.format("%6d", duration) +
-                "isFirstOrLast:  " + isFirstOrLast;
+        return "Interval{" +
+                "isFirstOrLast=" + isFirstOrLast +
+                ", duration=" + duration +
+                '}';
     }
 
     // MAIN METHOD FOR TESTING
