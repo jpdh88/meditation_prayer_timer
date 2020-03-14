@@ -95,12 +95,17 @@ public class Sequence {
      * Creates a new Interval object and inserts it at the second-to-last spot
      * @param duration The duration of the new Interval in minutes
      */
-    public void addInterval(double duration) {
+    public boolean addInterval(double duration) {
+        boolean actionPerformed = false;
+
         if (duration >= 0) {
             this.addInterval(duration, intervalArrayList.size() - 1);
+            actionPerformed = true;
         } else {
             System.out.println("Sequence Class Error: Duration must be a positive integer.");
         }
+
+        return actionPerformed;
     }
 
     /**
@@ -108,23 +113,32 @@ public class Sequence {
      *  - The last Interval in the array cannot be changed
      * @param index The index of the Subsequence in intervalArrayList that is being being edited
      * @param newDuration The new duration of the Interval in milliseconds
+     * @return Whether the edit action was performed or not
      */
-    public void editInterval (int index, int newDuration) {
+    public boolean editInterval (int index, int newDuration) {
+        boolean actionPerformed = false;
+
         if (index == intervalArrayList.size() - 1) {
             System.out.println("Sequence Class Error: You can't edit that one.");
         } else if (index < 0 || index >= intervalArrayList.size()){
             System.out.println("Sequence Class Error: Index out of range.");
         } else {
             intervalArrayList.get(index).setDuration(newDuration);
+            actionPerformed = true;
         }
+
+        return actionPerformed;
     }
 
     /**
      * Swap two Interval objects' positions
      * @param index1 One of the Interval objects to be swapped
      * @param index2 The other Interval object to be swapped
+     * @return Whether the swap was performed or not
      */
-    public void swapIntervals (int index1, int index2) {
+    public boolean swapIntervals (int index1, int index2) {
+        boolean actionPerformed = false;
+
         if (    index1 == 0 ||
                 index1 == intervalArrayList.size() - 1 ||
                 index2 == 0 ||
@@ -135,23 +149,71 @@ public class Sequence {
             System.out.println("Sequence Class Error: One or more indexes are out of range.");
         } else {
             Collections.swap(intervalArrayList, index1, index2);
+            actionPerformed = true;
         }
+
+        return actionPerformed;
+    }
+    /**
+     * Moves an Interval object left in the array
+     * @param index the index of the Interval object
+     * @return Whether the move was performed or not
+     */
+    public boolean moveIntervalLeft(int index) {
+        boolean actionPerformed = false;
+
+        if (    index == 0 ||
+                index == intervalArrayList.size() - 1 ) {
+            System.out.println("Sequence Class Error: You can't move the first or last Intervals.");
+        } else if ( index == 1) {
+            System.out.println("Sequence Class Error: You can't displace the first Interval");
+        } else {
+            swapIntervals(index, index - 1);
+            actionPerformed = true;
+        }
+
+        return actionPerformed;
+    }
+    /**
+     * Moves an Interval object right in the array
+     * @param index the index of the Interval object
+     * @return Whether the move was performed or not
+     */
+    public boolean moveIntervalRight(int index) {
+        boolean actionPerformed = false;
+
+        if (    index == 0 ||
+                index == intervalArrayList.size() - 1 ) {
+            System.out.println("Sequence Class Error: You can't move the first or last Intervals.");
+        } else if ( index == intervalArrayList.size() - 2) {
+            System.out.println("Sequence Class Error: You can't displace the last Interval");
+        } else {
+            swapIntervals(index, index + 1);
+            actionPerformed = true;
+        }
+
+        return actionPerformed;
     }
 
     /**
      * Deletes an Interval object from the intervalArrayList
      *  - The first or last Interval object cannot be deleted
      * @param interval The index of the Interval object in intervalArrayList that is being being removed
+     * @return Whether the delete action was performed or not
      */
-    public void deleteInterval(int interval) {
+    public boolean deleteInterval(int interval) {
+        boolean actionPerformed = false;
+
         if (interval < 0 || interval >= intervalArrayList.size()) {
             System.out.println("Sequence Class Error: Index out of range.");
         } else if (interval == 0 || (interval == intervalArrayList.size() - 1)){
             System.out.println("Sequence Class Error: You can't remove the first or last Interval.");
         } else {
             intervalArrayList.remove(interval);
+            actionPerformed = true;
         }
 
+        return actionPerformed;
     }
 
     // *** Utility method()
@@ -171,17 +233,27 @@ public class Sequence {
 
     // MAIN METHOD FOR TESTING
     public static void main(String[] args) {
-        /*
         Sequence my_sequence = new Sequence();
         my_sequence.addInterval(500);
         my_sequence.addInterval(15);
         my_sequence.addInterval(259);
         System.out.println(my_sequence);
-        my_sequence.removeInterval(2);
+        // my_sequence.deleteInterval(2);
         System.out.println(my_sequence);
         my_sequence.editInterval(4, 900);
         System.out.println(my_sequence);
+        // my_sequence.swapIntervals(1, 3);
+//        my_sequence.moveIntervalLeft(0);
+//        my_sequence.moveIntervalLeft(4);
+//        my_sequence.moveIntervalLeft(1);
+//        my_sequence.moveIntervalLeft(3);
+//        System.out.println(my_sequence);
+//        my_sequence.moveIntervalRight(0);
+//        my_sequence.moveIntervalRight(4);
+//        my_sequence.moveIntervalRight(3);
+        my_sequence.moveIntervalRight(1);
+        System.out.println(my_sequence);
 
-         */
+
     }
 }
