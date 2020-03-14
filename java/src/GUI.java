@@ -4,6 +4,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
@@ -31,23 +32,42 @@ public class GUI extends Application {
     //      *** background
     Canvas canvasBG;
     GraphicsContext gcBG;
-    //      *** ListView to display sequence
-    ListView<Interval> lvInterval;
+    //      *** Sequence Editor components
+    ListView<String> lvInterval;
+    Button btnAddInterval;
+    Button btnMoveIntervalLeft;
+    Button btnMoveIntervalRight;
+    Button btnDeleteInterval;
 
     // METHODS
     //  - Helper methods
+    /**
+     * Gets an array, of the durations, of all intervals in the sequence
+     * @return
+     */
+    public String[] getIntervalDurations() {
+        // we subtract one from the length of the array because we don't want to display the final interval (it's just
+        //  a placeholder for final sound
+        String[] durations = new String[sequence.getSequenceArray().length - 1];
+
+        for (int index = 0; index < sequence.getSequenceArray().length - 1; index++) {
+            durations[index] = Double.toString(sequence.getSequenceArray()[index].getDuration());
+        }
+
+        return durations;
+    }
     //  - Graphic methods
     //      *** draw the ListView
-    public void drawLVInterval() {
+    public void updateLVInterval() {
         // populate the list view with the sequence array
-        lvInterval.setItems(FXCollections.observableArrayList(sequence.getSequenceArray()));
+        lvInterval.setItems(FXCollections.observableArrayList(getIntervalDurations()));
 
         // set the attributes
         lvInterval.setPrefWidth(WINDOW_W - MARGIN * 2);
         lvInterval.setPrefHeight(WINDOW_H * 0.07);
         lvInterval.setOrientation(Orientation.HORIZONTAL);
 
-        lvInterval.relocate(MARGIN, WINDOW_H * 0.64);
+        lvInterval.relocate(MARGIN, WINDOW_H * 0.60);
     }
 
 
@@ -73,9 +93,14 @@ public class GUI extends Application {
         canvasBG = new Canvas(WINDOW_W, WINDOW_H);
         gcBG = canvasBG.getGraphicsContext2D();
         gcBG.drawImage(new Image("resources/images/background.png"), 0, 0, WINDOW_W, WINDOW_H);
-        // Set up the Interval Horizontal ListBox
-        lvInterval = new ListView<Interval>();
-        drawLVInterval();
+        // Set up the Sequence Editor objects
+        lvInterval = new ListView<String>();
+        updateLVInterval();
+        btnAddInterval = new Button("Add Interval");
+        btnMoveIntervalLeft = new Button ("Move Left");
+        btnMoveIntervalRight = new Button ("Move Right");
+        btnDeleteInterval = new Button ("Delete Interval");
+
 
         // TODO: 3. Add components to the root
         root.getChildren().addAll(canvasBG, lvInterval);
