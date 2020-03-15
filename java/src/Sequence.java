@@ -1,3 +1,6 @@
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
@@ -218,10 +221,50 @@ public class Sequence {
 
     // *** Utility method()
     /**
+     * Plays the main sound
+     * @throws InterruptedException
+     * @throws UnsupportedAudioFileException
+     * @throws LineUnavailableException
+     * @throws IOException
+     */
+    public void playMainSound() {
+        try {
+            Sound.playSound(mainSound.getSoundStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * Plays the secondary sound
+     * @throws InterruptedException
+     * @throws UnsupportedAudioFileException
+     * @throws LineUnavailableException
+     * @throws IOException
+     */
+    public void playSecondarySound() {
+        try {
+            Sound.playSound(intervalSound.getSoundStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * toString method
      * @return Returns a String of the Object's variables
      */
-
     @Override
     public String toString() {
         String output = "Sequence Object:";
