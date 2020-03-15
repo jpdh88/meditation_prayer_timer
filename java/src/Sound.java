@@ -76,6 +76,25 @@ public class Sound {
     }
 
     /**
+     * Gets the index location of a name of a sound
+     * @param soundName The name of the sound
+     * @return The index of the sound name
+     */
+    public static int getSoundIndex(String soundName) {
+        String[] soundList = getSoundList();
+
+        int index;
+        for (index = 0; index < soundList.length; index++) {
+            if (soundName.equals(soundList[index])) {
+                // This is the index we want, so break
+                break;
+            }
+        }
+
+        return index;
+    }
+
+    /**
      * Gets the full path associated with a sound's name from the soundList
      * @param soundName The name of the sound
      * @return the full path associated with the sound's name
@@ -249,5 +268,6 @@ public class Sound {
         System.out.println(mySound.getSoundDuration());
         AudioInputStream mystream = mySound.getSoundStream();
         // mySound.playSound();
+        System.out.println(Sound.getSoundIndex("Church Bell 2"));
     }
 }
