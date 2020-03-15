@@ -110,6 +110,8 @@ public class Sound {
      *      - From: https://stackoverflow.com/questions/26305/how-can-i-play-sound-in-java
      *      - From: https://www3.ntu.edu.sg/home/ehchua/programming/java/J8c_PlayingSound.html
      *      - From: https://stackoverflow.com/tags/javasound/info
+     *
+     * @param audioInputStream The sound stream to be played
      */
     public static void playSound(AudioInputStream audioInputStream) throws IOException,
             UnsupportedAudioFileException, LineUnavailableException, InterruptedException {
