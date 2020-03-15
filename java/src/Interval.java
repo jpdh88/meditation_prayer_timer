@@ -25,7 +25,7 @@ public class Interval {
      *
      * @param duration Duration of the sequence in minutes
      */
-    public void setDuration(long duration) {
+    public void setDuration(double duration) {
         this.duration = duration;
     }
 
