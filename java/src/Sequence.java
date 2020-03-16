@@ -222,43 +222,15 @@ public class Sequence {
     // *** Utility method()
     /**
      * Plays the main sound
-     * @throws InterruptedException
-     * @throws UnsupportedAudioFileException
-     * @throws LineUnavailableException
-     * @throws IOException
      */
     public void playMainSound() {
-        try {
             Sound.playSound(mainSound.getSoundStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        } catch (LineUnavailableException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
     /**
      * Plays the secondary sound
-     * @throws InterruptedException
-     * @throws UnsupportedAudioFileException
-     * @throws LineUnavailableException
-     * @throws IOException
      */
     public void playSecondarySound() {
-        try {
             Sound.playSound(intervalSound.getSoundStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        } catch (LineUnavailableException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     /**

@@ -113,8 +113,7 @@ public class Sound {
      *
      * @param audioInputStream The sound stream to be played
      */
-    public static void playSound(AudioInputStream audioInputStream) throws IOException,
-            UnsupportedAudioFileException, LineUnavailableException, InterruptedException {
+    public static void playSound(AudioInputStream audioInputStream) {
         /**
          * Checks the status of a playing sound file for if it is playing or not
          */
@@ -138,22 +137,48 @@ public class Sound {
             }
         }
 
-        // Instantiate the Audio Listener
-        AudioListener listener = new AudioListener();
+        // Start the anonymous thread
+        Thread soundThread = new Thread() {
+            public void run() {
+                // Instantiate the Audio Listener
+                AudioListener listener = new AudioListener();
 
-        try {
-            Clip clip = AudioSystem.getClip();
-            clip.addLineListener(listener);
-            clip.open(audioInputStream);
-            try {
-                clip.start(); // play the sound
-                listener.waitUntilDone(); // start the Audio Listener
-            } finally {
-                clip.close();
+                try {
+                    Clip clip = null;
+                    try {
+                        clip = AudioSystem.getClip();
+                    } catch (LineUnavailableException e) {
+                        e.printStackTrace();
+                    }
+                    clip.addLineListener(listener);
+                    try {
+                        clip.open(audioInputStream);
+                    } catch (LineUnavailableException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        clip.start(); // play the sound
+                        try {
+                            listener.waitUntilDone(); // start the Audio Listener
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } finally {
+                        clip.close();
+                    }
+                } finally {
+                    try {
+                        audioInputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        } finally {
-            audioInputStream.close();
-        }
+        };
+
+        soundThread.start();
     }
 
     // *** Constructors
