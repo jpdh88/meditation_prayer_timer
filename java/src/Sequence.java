@@ -96,7 +96,7 @@ public class Sequence {
             totalDuration += eachInterval.getDuration();
         }
 
-        return getTotalDuration();
+        return totalDuration;
     }
 
     // *** Manipulation method(s)
@@ -263,13 +263,13 @@ public class Sequence {
     // MAIN METHOD FOR TESTING
     public static void main(String[] args) {
         Sequence my_sequence = new Sequence();
-        my_sequence.addInterval(500);
-        my_sequence.addInterval(15);
-        my_sequence.addInterval(259);
+        my_sequence.addInterval(10);
+        my_sequence.addInterval(9);
+        my_sequence.addInterval(8);
         System.out.println(my_sequence);
         // my_sequence.deleteInterval(2);
         System.out.println(my_sequence);
-        my_sequence.editInterval(4, 900);
+        my_sequence.editInterval(4, 6);
         System.out.println(my_sequence);
         // my_sequence.swapIntervals(1, 3);
 //        my_sequence.moveIntervalLeft(0);
@@ -283,6 +283,6 @@ public class Sequence {
         my_sequence.moveIntervalRight(1);
         System.out.println(my_sequence);
 
-
+        System.out.println(my_sequence.getTotalDuration());
     }
 }
