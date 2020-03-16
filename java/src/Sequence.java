@@ -89,8 +89,8 @@ public class Sequence {
      * Get the total duration of all intervals in the Sequence object
      * @return the total duration of all intervals in the Sequence object
      */
-    public int getTotalDuration() {
-        int totalDuration = 0;
+    public double getTotalDuration() {
+        double totalDuration = 0;
 
         for (Interval eachInterval: getSequenceArray()) {
             totalDuration += eachInterval.getDuration();
