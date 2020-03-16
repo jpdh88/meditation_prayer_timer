@@ -85,6 +85,20 @@ public class Sequence {
         return intervalArrayList.size();
     }
 
+    /**
+     * Get the total duration of all intervals in the Sequence object
+     * @return the total duration of all intervals in the Sequence object
+     */
+    public int getTotalDuration() {
+        int totalDuration = 0;
+
+        for (Interval eachInterval: getSequenceArray()) {
+            totalDuration += eachInterval.getDuration();
+        }
+
+        return getTotalDuration();
+    }
+
     // *** Manipulation method(s)
     /**
      * Creates a new Interval object and inserts it at index location in intervalArrayList
