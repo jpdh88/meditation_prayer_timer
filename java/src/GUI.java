@@ -127,17 +127,16 @@ public class GUI extends Application {
         tfDuration.relocate(DURATION_W, LV_H);
         //  - draw the ListView label
         lblInterval.relocate(MARGIN, DURATION_H);
-        //  - draw the progress indicator
-        final double INDIC_H = DURATION_H - piSessionStatus.getHeight();
-        piSessionStatus.relocate(MARGIN, INDIC_H);
         //  - draw the Sound options
         lblSoundBackground.setPrefHeight(PADDING * 2 + (COMP_H / 2) * 2 + lblSounds.getHeight());
-        lblSoundBackground.relocate(MARGIN, INDIC_H - PADDING * 3 - (COMP_H / 2) * 2 - lblSounds.getHeight());
-        cbSecondSound.relocate(MARGIN, INDIC_H - PADDING - (COMP_H / 2));
-        btnPlaySecondSound.relocate(MARGIN + BUTTON_W + PADDING, INDIC_H - PADDING - (COMP_H / 2));
-        cbMainSound.relocate(MARGIN, INDIC_H - PADDING * 2 - (COMP_H / 2) * 2);
-        btnPlayMainSound.relocate(MARGIN + BUTTON_W + PADDING, INDIC_H - PADDING * 2 - (COMP_H / 2) * 2);
-        lblSounds.relocate(MARGIN, INDIC_H - PADDING * 3 - (COMP_H / 2) * 2 - lblSounds.getHeight());
+        lblSoundBackground.relocate(MARGIN, DURATION_H - (COMP_H / 2) * 2 - PADDING * 3 - lblSounds.getHeight());
+        cbSecondSound.relocate(MARGIN, DURATION_H - COMP_H / 2 - PADDING * 1);
+        btnPlaySecondSound.relocate(MARGIN + BUTTON_W + PADDING, DURATION_H - COMP_H / 2 - PADDING * 1);
+        cbMainSound.relocate(MARGIN, DURATION_H - (COMP_H / 2) * 2 - PADDING * 2);
+        btnPlayMainSound.relocate(MARGIN + BUTTON_W + PADDING, DURATION_H - (COMP_H / 2) * 2 - PADDING * 2);
+        lblSounds.relocate(MARGIN, DURATION_H - (COMP_H / 2) * 2 - PADDING * 3 - lblSounds.getHeight());
+        //  - draw the progress indicator
+        piSessionStatus.relocate(MARGIN, MARGIN);
     }
 
     //  - Handler methods
@@ -356,7 +355,7 @@ public class GUI extends Application {
         lblSounds.setAlignment(Pos.BOTTOM_CENTER);
         // CONFIGURE Progress indicator
         piSessionStatus.setProgress(0.1);
-        piSessionStatus.setPrefSize(SOUND_MAX_W, COMP_MAX_W / 2);
+        piSessionStatus.setPrefSize(COMP_MAX_W, COMP_MAX_W * 0.75);
 
         // TODO: 5. Add Event Handlers and do final setup
         //  - Sound handlers
