@@ -1,0 +1,174 @@
+/* GLOBAL STYLES */
+* {
+    -fx-font-family: "Arial";
+}
+
+/* BACKGROUNDS */
+.label-background {
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+    -fx-background-radius: 5 5 0 0;
+
+    -fx-border-width: 0;
+}
+
+/* BUTTONS */
+.button {
+    -fx-background-color: rgba(83, 56, 25, 0.5);
+    -fx-border-color: rgba(83, 56, 25, 0.8);
+
+    -fx-text-fill: rgba(83, 56, 25, 0.8);
+}
+
+.button:pressed {
+    -fx-border-insets: 0 0 0 15;
+    -fx-border-width: 1 1 1 3;
+}
+
+    .button-move-l {
+        -fx-background-image: url('/resources/images/button-1.png');
+
+        -fx-font-size: 20;
+    }
+    .button-move-r {
+        -fx-background-image: url('/resources/images/button-2.png');
+
+        -fx-font-size: 20;
+    }
+    .button-add {
+        -fx-background-image: url('/resources/images/button-3.png');
+
+        -fx-font-size: 20;
+    }
+    .button-delete {
+        -fx-background-image: url('/resources/images/button-4.png');
+
+        -fx-font-size: 20;
+    }
+
+    .button-play {
+        -fx-padding: 0 5 0 5;
+        -fx-background-image: url('/resources/images/button-play.png');
+
+        -fx-font-size: 20;
+    }
+
+    .button-set {
+        -fx-background-image: url('/resources/images/button-set.png');
+        -fx-border-color: rgba(83, 56, 25, 0.8);
+        -fx-border-width: 1;
+        -fx-padding: 0;
+
+        -fx-font-size: 15;
+    }
+
+/* LABELS */
+.label {
+    -fx-padding: 5;
+    -fx-border-color: rgba(83, 56, 25, 0.8);
+
+    -fx-font-size: 24;
+    -fx-underline: true;
+    -fx-text-fill: rgba(83, 56, 25, 0.8);
+}
+
+    .secondary-label {
+        -fx-padding: 3;
+        -fx-border-color: rgba(83, 56, 25, 0.4);
+        -fx-border-radius: 5 5 0 0;
+
+        -fx-font-size: 11;
+        -fx-text-fill: rgba(83, 56, 25, 0.8);
+    }
+
+/* LISTVIEW */
+.list-view {
+    -fx-border-color: rgba(83, 56, 25, 0.8);
+    -fx-border-width: 1;
+    -fx-background-image: url('/resources/images/inputs.png');
+}
+.list-view .list-cell {
+    -fx-background-color: rgba(255,255,255,0.1);
+
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+}
+.list-view .list-cell:selected {
+    -fx-background-color: rgba(255,255,255,0.2);
+    -fx-border-width: 0;
+
+    -fx-font-size: 13;
+    -fx-text-fill: rgba(255, 255, 255, 0.8);
+}
+
+/* COMBOBOX */
+.combo-box {
+    -fx-background-image: url('/resources/images/inputs.png');
+    -fx-border-color: rgba(83, 56, 25, 0.8);
+    -fx-border-width: 1;
+}
+.combo-box:selected {
+    -fx-border-color: rgba(83, 56, 25, 0.8);
+    -fx-border-width: 1;
+}
+    .combo-box .list-cell {
+        -fx-background-color: rgba(255, 255, 255, 0.1);
+
+        -fx-text-fill: rgba(255, 255, 255, 0.7);
+        -fx-font-size: 13;
+    }
+    .combo-box .list-cell:selected {
+        -fx-background-color: rgba(255, 255, 255, 0.2);
+
+        -fx-text-fill: rgba(255, 255, 255, 0.8);
+        -fx-font-size: 13;
+    }
+    .combo-box .arrow-button {
+        -fx-shape: " ";
+        -fx-background-color: rgba(255, 255, 255, 0.9);
+    }
+
+/* TEXTFIELD */
+.text-field {
+    -fx-background-image: url('/resources/images/inputs.png');
+    -fx-padding: 0 0 0 5;
+
+    -fx-border-color: rgba(83, 56, 25, 0.8);
+    -fx-border-width: 1;
+
+    -fx-font-size: 13;
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+}
+
+/* SCROLLBARS */
+/* https://blog.ngopal.com.np/2012/07/11/customize-scrollbar-via-css/ */
+.scroll-bar {
+    -fx-border-color: rgba(0, 0, 0, 0);
+}
+.scroll-bar .track {
+    -fx-padding: 3;
+}
+.scroll-bar:horizontal .track {
+    -fx-background-image: url('/resources/images/scrollbar-h.png');
+}
+.scroll-bar:vertical .track {
+    -fx-background-image: url('/resources/images/scrollbar-v.png');
+}
+.scroll-bar .increment-button, .scroll-bar .decrement-button {
+    -fx-background-image: url('/resources/images/button-play.png');
+}
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow {
+	-fx-shape: " ";
+}
+.scroll-bar .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* PROGRESS INDICATOR */
+.progress-indicator {
+    -fx-progress-color: rgba(255, 255, 255, 0.5);
+}
+.progress-indicator .indicator {
+    -fx-background-image: url('/resources/images/progressind.png');
+}
+.progress-indicator .percentage {
+    -fx-fill: null;
+}
