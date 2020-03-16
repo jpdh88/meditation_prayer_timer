@@ -30,8 +30,7 @@ public class Sequence {
      *  Time format: 15m * 60s * 1000ms = 15m
      */
     public Sequence() {
-        intervalArrayList.add( new Interval(15, true));
-        intervalArrayList.add( new Interval(0, true));
+        intervalArrayList.add( new Interval(30));
         mainSound = new Sound(true);
         intervalSound = new Sound(false);
     }
@@ -106,17 +105,17 @@ public class Sequence {
      * @param duration The length of the new Interval object in minutes
      */
     public void addInterval(double duration, int index) {
-        intervalArrayList.add(index, new Interval(duration, false));
+        intervalArrayList.add(index, new Interval(duration));
     }
     /**
-     * Creates a new Interval object and inserts it at the second-to-last spot
+     * Creates a new Interval object and inserts it at the last spot
      * @param duration The duration of the new Interval in minutes
      */
     public boolean addInterval(double duration) {
         boolean actionPerformed = false;
 
         if (duration >= 0) {
-            this.addInterval(duration, intervalArrayList.size() - 1);
+            this.addInterval(duration, intervalArrayList.size());
             actionPerformed = true;
         } else {
             System.out.println("Sequence Class Error: Duration must be a positive integer.");
@@ -135,9 +134,7 @@ public class Sequence {
     public boolean editInterval (int index, int newDuration) {
         boolean actionPerformed = false;
 
-        if (index == intervalArrayList.size() - 1) {
-            System.out.println("Sequence Class Error: You can't edit that one.");
-        } else if (index < 0 || index >= intervalArrayList.size()){
+        if (index < 0 || index >= intervalArrayList.size()){
             System.out.println("Sequence Class Error: Index out of range.");
         } else {
             intervalArrayList.get(index).setDuration(newDuration);
@@ -156,13 +153,8 @@ public class Sequence {
     public boolean swapIntervals (int index1, int index2) {
         boolean actionPerformed = false;
 
-        if (    index1 == 0 ||
-                index1 == intervalArrayList.size() - 1 ||
-                index2 == 0 ||
-                index2 == intervalArrayList.size() - 1 ) {
-            System.out.println("Sequence Class Error: You can't use swap with the first or last Interval.");
-        } else if ( index1 >= intervalArrayList.size() ||
-                    index2 >= intervalArrayList.size() ) {
+        if ( index1 >= intervalArrayList.size() ||
+                index2 >= intervalArrayList.size() ) {
             System.out.println("Sequence Class Error: One or more indexes are out of range.");
         } else {
             Collections.swap(intervalArrayList, index1, index2);
@@ -176,40 +168,17 @@ public class Sequence {
      * @param index the index of the Interval object
      * @return Whether the move was performed or not
      */
-    public boolean moveIntervalLeft(int index) {
-        boolean actionPerformed = false;
-
-        if (    index == 0 ||
-                index == intervalArrayList.size() - 1 ) {
-            System.out.println("Sequence Class Error: You can't move the first or last Intervals.");
-        } else if ( index == 1) {
-            System.out.println("Sequence Class Error: You can't displace the first Interval");
-        } else {
-            swapIntervals(index, index - 1);
-            actionPerformed = true;
-        }
-
-        return actionPerformed;
+    public void moveIntervalLeft(int index) {
+        swapIntervals(index, index - 1);
     }
     /**
      * Moves an Interval object right in the array
      * @param index the index of the Interval object
      * @return Whether the move was performed or not
      */
-    public boolean moveIntervalRight(int index) {
-        boolean actionPerformed = false;
-
-        if (    index == 0 ||
-                index == intervalArrayList.size() - 1 ) {
-            System.out.println("Sequence Class Error: You can't move the first or last Intervals.");
-        } else if ( index == intervalArrayList.size() - 2) {
-            System.out.println("Sequence Class Error: You can't displace the last Interval");
-        } else {
-            swapIntervals(index, index + 1);
-            actionPerformed = true;
-        }
-
-        return actionPerformed;
+    public void
+    moveIntervalRight(int index) {
+        swapIntervals(index, index + 1);
     }
 
     /**
@@ -223,8 +192,8 @@ public class Sequence {
 
         if (interval < 0 || interval >= intervalArrayList.size()) {
             System.out.println("Sequence Class Error: Index out of range.");
-        } else if (interval == 0 || (interval == intervalArrayList.size() - 1)){
-            System.out.println("Sequence Class Error: You can't remove the first or last Interval.");
+        } else if (intervalArrayList.size() == 1) {
+            System.out.println("Sequence Class Error: You need at least one Interval.");
         } else {
             intervalArrayList.remove(interval);
             actionPerformed = true;
@@ -262,27 +231,6 @@ public class Sequence {
 
     // MAIN METHOD FOR TESTING
     public static void main(String[] args) {
-        Sequence my_sequence = new Sequence();
-        my_sequence.addInterval(10);
-        my_sequence.addInterval(9);
-        my_sequence.addInterval(8);
-        System.out.println(my_sequence);
-        // my_sequence.deleteInterval(2);
-        System.out.println(my_sequence);
-        my_sequence.editInterval(4, 6);
-        System.out.println(my_sequence);
-        // my_sequence.swapIntervals(1, 3);
-//        my_sequence.moveIntervalLeft(0);
-//        my_sequence.moveIntervalLeft(4);
-//        my_sequence.moveIntervalLeft(1);
-//        my_sequence.moveIntervalLeft(3);
-//        System.out.println(my_sequence);
-//        my_sequence.moveIntervalRight(0);
-//        my_sequence.moveIntervalRight(4);
-//        my_sequence.moveIntervalRight(3);
-        my_sequence.moveIntervalRight(1);
-        System.out.println(my_sequence);
 
-        System.out.println(my_sequence.getTotalDuration());
     }
 }
