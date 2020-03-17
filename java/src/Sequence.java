@@ -20,14 +20,14 @@ public class Sequence {
     /** Array of Intervals **/
     private ArrayList<Interval> intervalArrayList = new ArrayList<>();
     /** Sound Object for first and last Intervals (the "Main" Intervals) **/
-    private static Sound mainSound;
+    private Sound mainSound;
     /** Sound Object for intervening Intervals **/
-    private static Sound secondarySound;
+    private Sound secondarySound;
     /** Prefix and Suffix for save files **/
-    private static String prefix = "profile-";
-    private static String suffix = ".prof";
+    private String prefix = "profile-";
+    private String suffix = ".prof";
     /** The profiles available to the user (max. 11 profiles)**/
-    private static boolean[] isAProfile = new boolean[11]; // [0] is for default; user gets [1-10]; true means profile exists
+    private boolean[] isAProfile = new boolean[11]; // [0] is for default; user gets [1-10]; true means profile exists
 
     // METHODS
     // *** Constructor(s)
