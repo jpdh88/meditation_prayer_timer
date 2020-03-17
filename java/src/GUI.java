@@ -37,19 +37,30 @@ import java.util.Date;
 public class GUI extends Application {
     // VARIABLES
     //  - Window and graphics dimensions
+    /** The GUI style that will be used **/
     private final String STYLE = "style1"; // style1, style2, or style3
+    /** Width of the window **/
     private final double WINDOW_W = 412;
+    /** Height of the window ***/
     private final double WINDOW_H = 732;
+    /** Default margin for arranging graphical components **/
     private final double MARGIN = 15;
+    /** Default padding for arranging graphical components **/
     private final double PADDING = 10;
+    /** Max width of a graphical component (many graphical components are relative to this) **/
     private final double COMP_MAX_W = WINDOW_W - MARGIN * 2;
+    /** The standard height of a graphical component (many graphical components are relative to this) **/
     private final double COMP_H = WINDOW_H * 0.09;
     //  - Timer variables
     /** The total duration of all the intervals in the Sequence object **/
     private double totalDuration;
+    /** The time the timer was started **/
     private long timerStartTime;
+    /** The time the timer was paused **/
     private long timerPausedTime;
+    /** Whether the timer should keep running or not **/
     private boolean keepTimerRunning;
+    /** Whether the timer is paused or not **/
     private boolean timerIsPaused = false;
     /** Array of sound tasks and when to play them **/
     private double[][] soundSchedule;
@@ -57,10 +68,15 @@ public class GUI extends Application {
     private int soundIndex = 0;
 
     //  - Instance variable(s)
+    /** The Sequence object to keep track of the intervals **/
     Sequence sequence = new Sequence();
+    /** ObservableList of Main sounds (for the ListView) **/
     ObservableList soundListMain = FXCollections.observableArrayList(Sound.getSoundList());
+    /** ObservableList of Secondary sounds (for the ListView) **/
     ObservableList soundListSecond = FXCollections.observableArrayList(Sound.getSoundList());
+    /** The main sound to be used (can be changed by user) **/
     String mainSound = sequence.getMainSoundName();
+    /** The secondary sound to be used (can be changed by user) **/
     String secondSound = sequence.getSecondarySoundName();
 
     //  - Graphical components
@@ -343,6 +359,10 @@ public class GUI extends Application {
         // Populate the ListView with the sequence array
         lvIntervals.setItems(FXCollections.observableArrayList(getSequenceViewerItems()));
     }
+    /**
+     * Updates the ProgressIndicator
+     * @param proportionComplete What proportion of the total duration has been completed
+     */
     public void updateSessionStatus(double proportionComplete) {
         // Update the ProgressIndicator
         piSessionStatus.setProgress(proportionComplete);
@@ -399,7 +419,8 @@ public class GUI extends Application {
     //  - Handler methods
     //      *** ...for the Sound components
     /**
-     * Plays a sound when one of the play buttons have been pressed
+     * Handler: Plays a sound when one of the play buttons have been pressed
+     * NOTE: this uses the old non-JavaFX version--keeping it here for later learning
      * @param e MouseEvent
      */
     private void playSoundHandler(MouseEvent e) {
@@ -427,17 +448,25 @@ public class GUI extends Application {
             sequence.playSecondarySound();
         }
     }
+    /**
+     * Handler: Sets the main sound to the one chosen by the user in the combo box
+     * @param e Event
+     */
     public void setMainSoundHandler(Event e) {
         int soundIndex = cbMainSound.getSelectionModel().getSelectedIndex();
         sequence.setMainSound(Sound.getSoundList()[soundIndex]);
     }
+    /**
+     * Handler: Sets the main sound to the one chosen by the user in the combo box
+     * @param e
+     */
     public void setSecondSoundHandler(Event e) {
         int soundIndex = cbSecondSound.getSelectionModel().getSelectedIndex();
         sequence.setSecondarySound(Sound.getSoundList()[soundIndex]);
     }
     //      *** ...for the ListView and Duration editing components
     /**
-     * Puts the duration of a selected Interval into the duration TextField
+     * Handler: Puts the duration of a selected Interval into the duration TextField
      * @param e MouseEvent
      */
     private void printDurationHandler(MouseEvent e) {
@@ -448,7 +477,7 @@ public class GUI extends Application {
         updateSequenceViewer();
     }
     /**
-     * Edits an interval's duration
+     * Handler: Edits an interval's duration
      * @param e ActionEvent
      */
     private void editDurationHandler(ActionEvent e) {
@@ -478,7 +507,7 @@ public class GUI extends Application {
     }
     //      *** ...for editing buttons
     /**
-     * Adds an Interval object to the end of the Sequence's Interval Array
+     * Handler: Adds an Interval object to the end of the Sequence's Interval Array
      * @param e ActionEvent
      */
     private void addIntervalHandler(ActionEvent e) {
@@ -487,7 +516,7 @@ public class GUI extends Application {
         updateSequenceViewer();
     }
     /**
-     * Deletes an Interval object from the Sequence's Interval Array
+     * Handler: Deletes an Interval object from the Sequence's Interval Array
      * @param e ActionEvent
      */
     private void deleteIntervalHandler(ActionEvent e) {
@@ -495,7 +524,7 @@ public class GUI extends Application {
         updateSequenceViewer();
     }
     /**
-     * Moves an Interval object to the left (swaps it with the Interval directly to its left)
+     * Handler: Moves an Interval object to the left (swaps it with the Interval directly to its left)
      * @param e ActionEvent
      */
     private void moveIntervalLeftHandler(ActionEvent e) {
@@ -503,7 +532,7 @@ public class GUI extends Application {
         updateSequenceViewer();
     }
     /**
-     * Moves an Interval object to the right (swaps it with the Interval directly to its right)
+     * Handler: Moves an Interval object to the right (swaps it with the Interval directly to its right)
      * @param e ActionEvent
      */
     private void moveIntervalRightHandler(ActionEvent e) {
@@ -511,19 +540,30 @@ public class GUI extends Application {
         updateSequenceViewer();
     }
     //      *** ...for the timer buttons
+    /**
+     * Handler: starts the timer
+     * @param e ActionEvent
+     */
     public void startTimerHandler(ActionEvent e) {
         startTimer();
     }
+    /**
+     * Handler: stops the timer
+     * @param e ActionEvent
+     */
     public void stopTimerHandler(ActionEvent e) {
         stopTimer();
     }
+    /**
+     * Handler: pauses the timer
+     * @param e ActionEvent
+     */
     public void pauseTimerHandler(ActionEvent e) {
         pauseTimer();
     }
 
     /**
-     * This is where you create your components and the model and add event
-     * handlers.
+     * Main start method
      *
      * @param stage The main stage
      * @throws Exception
