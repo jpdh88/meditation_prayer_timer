@@ -1,3 +1,6 @@
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
@@ -101,6 +104,26 @@ public class Sound {
      */
     public static String getPathFromSoundList(String soundName) {
         return soundList.get(soundName);
+    }
+
+    /**
+     * Plays a sound using JavaFX tools
+     * @param soundName the name of the sound
+     */
+    public static void playSoundJFX(String soundName) {
+        String musicFile = Sound.getPathFromSoundList(soundName);
+
+        Media sound = new Media(new File(musicFile).toURI().toString());
+
+        MediaPlayer mediaPlayer = new MediaPlayer(sound);
+
+        Thread soundThread = new Thread() {
+            public void run() {
+                mediaPlayer.play();
+            }
+        };
+
+        soundThread.start();
     }
 
     /**

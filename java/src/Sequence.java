@@ -215,6 +215,18 @@ public class Sequence {
     public void playSecondarySound() {
             Sound.playSound(intervalSound.getSoundStream());
     }
+    /**
+     * Plays the main sound using JavaFX tools
+     */
+    public void playMainSoundJFX() {
+        Sound.playSoundJFX(mainSound.getSoundName());
+    }
+    /**
+     * Plays the secondary sound using JavaFX tools
+     */
+    public void playSecondarySoundJFX() {
+        Sound.playSoundJFX(intervalSound.getSoundName());
+    }
 
     /**
      * toString method
