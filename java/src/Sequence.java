@@ -1,8 +1,9 @@
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -21,7 +22,12 @@ public class Sequence {
     /** Sound Object for first and last Intervals (the "Main" Intervals) **/
     private static Sound mainSound;
     /** Sound Object for intervening Intervals **/
-    private static Sound intervalSound;
+    private static Sound secondarySound;
+    /** Prefix and Suffix for save files **/
+    private static String prefix = "profile-";
+    private static String suffix = ".prof";
+    /** The profiles available to the user (max. 11 profiles)**/
+    private static boolean[] isAProfile = new boolean[11]; // [0] is for default; user gets [1-10]; true means profile exists
 
     // METHODS
     // *** Constructor(s)
@@ -30,9 +36,7 @@ public class Sequence {
      *  Time format: 15m * 60s * 1000ms = 15m
      */
     public Sequence() {
-        intervalArrayList.add( new Interval(30));
-        mainSound = new Sound(true);
-        intervalSound = new Sound(false);
+        loadDefaultProfile();
     }
 
     // *** Variable method(s)
@@ -57,7 +61,7 @@ public class Sequence {
      * @return The name of the sound that will be played
      */
     public String getSecondarySoundName() {
-        return intervalSound.getSoundName();
+        return secondarySound.getSoundName();
     }
 
     /**
@@ -65,7 +69,7 @@ public class Sequence {
      * @param soundName The name of the sound (must be in the Sound.soundList)
      */
     public void setSecondarySound(String soundName) {
-        intervalSound.setSound(soundName);
+        secondarySound.setSound(soundName);
     }
 
     /**
@@ -202,7 +206,7 @@ public class Sequence {
         return actionPerformed;
     }
 
-    // *** Utility method()
+    // *** Utility method(s)
     /**
      * Plays the main sound
      */
@@ -213,7 +217,7 @@ public class Sequence {
      * Plays the secondary sound
      */
     public void playSecondarySound() {
-            Sound.playSound(intervalSound.getSoundStream());
+            Sound.playSound(secondarySound.getSoundStream());
     }
     /**
      * Plays the main sound using JavaFX tools
@@ -225,7 +229,148 @@ public class Sequence {
      * Plays the secondary sound using JavaFX tools
      */
     public void playSecondarySoundJFX() {
-        Sound.playSoundJFX(intervalSound.getSoundName());
+        Sound.playSoundJFX(secondarySound.getSoundName());
+    }
+
+    /**
+     * Rebuilds the boolean array of isAProfile (to reflect any changes that might have been made)
+     */
+    public void rebuildProfiles() {
+        // Determine whether profiles exist
+        int profileNum = 1;
+
+        do {
+            try (InputStream input = new FileInputStream(prefix + profileNum + suffix)) {
+                // This profile exists
+                isAProfile[profileNum] = true;
+            } catch (IOException io) {
+                // This profile does not exist
+                isAProfile[profileNum] = false;
+            }
+            profileNum++;
+        } while (profileNum < isAProfile.length); // stop trying after a certain point (max # of profiles)
+    }
+
+    /**
+     * Get a list of all the profiles currently exist (i.e. there is a .prof file for it)
+     * @return a list of all the profiles currently exist (i.e. there is a .prof file for it)
+     */
+    public boolean[] getProfiles() {
+        rebuildProfiles();
+
+        return isAProfile;
+    }
+
+    /**
+     * Saves a sequence to a profile
+     * (Resource: https://mkyong.com/java/java-properties-file-examples/)
+     * @param index The profile number that the sequence will be written to
+     * @return Whether the profile was saved or not
+     */
+    public boolean saveProfile(int index) {
+        boolean wasSaved = false;
+
+        if (index > 0) { // Can't change the default profile
+            try (OutputStream output = new FileOutputStream(prefix + index + suffix)) {
+
+                Properties property = new Properties();
+
+                // set the properties values
+                property.setProperty("main_sound", mainSound.getSoundName()); // the main sound
+                property.setProperty("secondary_sound", secondarySound.getSoundName()); // the secondary sound
+
+                property.setProperty("num_intervals", Double.toString(intervalArrayList.size()));
+                for (int intervalIndex = 0; intervalIndex < intervalArrayList.size(); intervalIndex++) {
+                    property.setProperty("interval-" + intervalIndex, Double.toString(intervalArrayList.get(intervalIndex).getDuration()));
+                }
+
+                // save properties to project root folder
+                property.store(output, null);
+
+                wasSaved = true;
+            } catch (IOException io) {
+                System.out.println("Sequence Class Error: problem reading file");
+            }
+        }
+
+        // rebuild the list of profiles
+        rebuildProfiles();
+
+        return wasSaved;
+    }
+
+    /**
+     * Loads a sequence from a profile
+     * @param index The number of the profile (corresponds to a position in the array returned by getProfileList)
+     * @return Whether the profile was loaded or not
+     */
+    public boolean loadProfile(int index) {
+        boolean wasLoaded = false;
+
+        if (isAProfile[index]) {
+            // This profile exists so we can load from it
+            try (InputStream input = new FileInputStream(prefix + index + suffix)) {
+
+                Properties property = new Properties();
+
+                //load a properties file from class path, inside static method
+                property.load(input);
+
+                // Set the properties
+                //  - sounds
+                mainSound.setSound(property.getProperty("main_sound"));
+                secondarySound.setSound(property.getProperty("secondary_sound"));
+                //  - intervals
+                int numIntervals = Integer.parseInt(property.getProperty("num_intervals"));
+                intervalArrayList.clear(); // clear the list of intervals
+                for (int intervalIndex = 0; intervalIndex < numIntervals; intervalIndex++) {
+                    double duration = Double.parseDouble(property.getProperty("interval-" + intervalIndex));
+                    intervalArrayList.add(intervalIndex, new Interval(duration));
+                }
+
+                wasLoaded = true;
+            } catch (IOException ex) {
+                // Loading failed (for some reason)
+                System.out.println("Sequence Class Error: problem reading file");
+                ex.printStackTrace();
+            }
+        }
+
+        return wasLoaded;
+    }
+
+    /**
+     * Loads the default sequence with the default values (i.e. turns it into a new sequence)
+     * @return Whether the profile was loaded or not (I'm assuming that this can't fail)
+     */
+    public boolean loadDefaultProfile() {
+        intervalArrayList.clear(); // clear the list of intervals
+        intervalArrayList.add( new Interval(30));
+        mainSound = new Sound(true);
+        secondarySound = new Sound(false);
+
+        return true;
+    }
+
+    /**
+     * Delete a profile from the disk
+     * @param index The profile to be deleted
+     * @return Whether the profile was deleted or not
+     */
+    public boolean deleteProfile(int index) {
+        boolean wasDeleted = false;
+        File fileToDelete = new File(prefix + index + suffix);
+
+        if (fileToDelete.delete()) {
+            wasDeleted = true;
+        } else {
+            System.out.println("Sequence Class Error: file not deleted (might not exist)");
+        }
+
+        // rebuild the list of profiles
+        rebuildProfiles();
+
+        return wasDeleted;
     }
 
     /**
@@ -235,14 +380,40 @@ public class Sequence {
     @Override
     public String toString() {
         String output = "Sequence Object:";
+        output += "\n - mainSound = " + mainSound.getSoundName();
+        output += "\n - secondarySound = " + secondarySound.getSoundName();
+        output += "\n - Intervals:";
         for (Interval item: intervalArrayList) {
-            output += "\n - " + item;
+            output += "\n\t- " + item;
         }
         return output;
     }
 
     // MAIN METHOD FOR TESTING
     public static void main(String[] args) {
+        Sequence sequence = new Sequence();
+        sequence.addInterval(30);
+        sequence.addInterval(15);
+        sequence.addInterval(12);
+        sequence.addInterval(40);
 
+        for (boolean each: sequence.getProfiles()) {
+            System.out.println(each);
+        }
+
+        // sequence.saveSequenceToFile(1);
+        sequence.saveProfile(8);
+        sequence.loadProfile(2);
+        System.out.println(sequence);
+        sequence.loadDefaultProfile();
+        System.out.println(sequence);
+
+        for (boolean each: sequence.getProfiles()) {
+            System.out.println(each);
+        }
+
+//        for (String each: sequence.getProfiles()) {
+//            System.out.println(each);
+//        }
     }
 }
