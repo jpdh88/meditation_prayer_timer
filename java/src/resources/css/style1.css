@@ -17,40 +17,58 @@
 }
 
     .button-move-l {
-        -fx-background-image: url('/resources/images/button-1.png');
+        -fx-background-image: url('/resources/images/style1/button-1.png');
 
         -fx-font-size: 20;
     }
     .button-move-r {
-        -fx-background-image: url('/resources/images/button-2.png');
+        -fx-background-image: url('/resources/images/style1/button-2.png');
 
         -fx-font-size: 20;
     }
     .button-add {
-        -fx-background-image: url('/resources/images/button-3.png');
+        -fx-background-image: url('/resources/images/style1/button-3.png');
 
         -fx-font-size: 20;
     }
     .button-delete {
-        -fx-background-image: url('/resources/images/button-4.png');
+        -fx-background-image: url('/resources/images/style1/button-4.png');
 
         -fx-font-size: 20;
     }
 
     .button-play {
         -fx-padding: 0 5 0 5;
-        -fx-background-image: url('/resources/images/button-play.png');
+        -fx-background-image: url('/resources/images/style1/button-play.png');
 
         -fx-font-size: 20;
     }
 
     .button-set {
-        -fx-background-image: url('/resources/images/button-set.png');
+        -fx-background-image: url('/resources/images/style1/button-set.png');
         -fx-border-color: rgba(83, 56, 25, 0.8);
         -fx-border-width: 1;
         -fx-padding: 0;
 
         -fx-font-size: 15;
+    }
+
+    .button-timer-start {
+        -fx-background-color: rgba(255, 255, 255, 0.4);
+        -fx-border-width: 0;
+
+        -fx-font-size: 24;
+    }
+
+    .button-timer-control {
+        -fx-background-color: rgba(255, 255, 255, 0.4);
+        -fx-border-width: 0;
+
+        -fx-font-size: 24;
+    }
+    .button-timer-control:pressed {
+        -fx-border-insets: 0 0 0 15;
+        -fx-border-width: 0 0 0 3;
     }
 
 /* LABELS */
@@ -74,7 +92,7 @@
         -fx-text-fill: rgba(83, 56, 25, 0.8);
     }
     .label-background {
-        -fx-background-color: rgba(0, 0, 0, 0.1);
+        -fx-background-color: rgba(0, 0, 0, 0.2);
         -fx-background-radius: 5 5 0 0;
 
         -fx-border-width: 0;
@@ -84,7 +102,7 @@
 .list-view {
     -fx-border-color: rgba(83, 56, 25, 0.8);
     -fx-border-width: 1;
-    -fx-background-image: url('/resources/images/inputs.png');
+    -fx-background-image: url('/resources/images/style1/inputs.png');
 }
 .list-view .list-cell {
     -fx-background-color: rgba(255,255,255,0.1);
@@ -101,7 +119,7 @@
 
 /* COMBOBOX */
 .combo-box {
-    -fx-background-image: url('/resources/images/inputs.png');
+    -fx-background-image: url('/resources/images/style1/inputs.png');
     -fx-border-color: rgba(83, 56, 25, 0.8);
     -fx-border-width: 1;
 }
@@ -128,7 +146,7 @@
 
 /* TEXTFIELD */
 .text-field {
-    -fx-background-image: url('/resources/images/inputs.png');
+    -fx-background-image: url('/resources/images/style1/textfield.png');
     -fx-padding: 0 0 0 5;
 
     -fx-border-color: rgba(83, 56, 25, 0.8);
@@ -147,13 +165,13 @@
     -fx-padding: 3;
 }
 .scroll-bar:horizontal .track {
-    -fx-background-image: url('/resources/images/scrollbar-h.png');
+    -fx-background-image: url('/resources/images/style1/scrollbar-h.png');
 }
 .scroll-bar:vertical .track {
-    -fx-background-image: url('/resources/images/scrollbar-v.png');
+    -fx-background-image: url('/resources/images/style1/scrollbar-v.png');
 }
 .scroll-bar .increment-button, .scroll-bar .decrement-button {
-    -fx-background-image: url('/resources/images/button-play.png');
+    -fx-background-image: url('/resources/images/style1/button-play.png');
 }
 .scroll-bar .increment-arrow, .scroll-bar .decrement-arrow {
 	-fx-shape: " ";
@@ -167,10 +185,10 @@
     -fx-progress-color: rgba(255, 255, 255, 0.5);
 }
 .progress-indicator .indicator {
-    -fx-background-image: url('/resources/images/progressind.png');
+    -fx-background-image: url('/resources/images/style1/progressind.png');
     -fx-border-color: rgba(255, 255, 255, 0.5);
     -fx-border-width: 3;
 }
 .progress-indicator .percentage {
-    -fx-fill: null;
+    /* -fx-fill: null; */
 }

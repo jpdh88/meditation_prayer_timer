@@ -1,8 +1,8 @@
-import com.sun.javafx.geom.Rectangle;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,11 +12,15 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.TextAlignment;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.util.Date;
+
 /**
- * A GUI example of meditation timer
+ * A GUI example of meditation xtimer
  * started 2020-03-14
  *
  * TODO:
@@ -24,7 +28,8 @@ import javafx.stage.Stage;
  *  - _actually_ encapsulate the array returned by Sequence
  *      - this will require changing several methods
  *
- * Background image: https://www.pexels.com/@zhangkaiyv
+ * Style1 image: https://www.pexels.com/@zhangkaiyv
+ * Style2 image: https://www.pexels.com/@punchbrandstock
  *
  * @author josephhaley
  * @author Sam Scott (GUI template)
@@ -32,12 +37,24 @@ import javafx.stage.Stage;
 public class GUI extends Application {
     // VARIABLES
     //  - Window and graphics dimensions
+    private final String STYLE = "style1"; // style1, style2, or style3
     private final double WINDOW_W = 412;
     private final double WINDOW_H = 732;
     private final double MARGIN = 15;
     private final double PADDING = 10;
     private final double COMP_MAX_W = WINDOW_W - MARGIN * 2;
     private final double COMP_H = WINDOW_H * 0.09;
+    //  - Timer variables
+    /** The total duration of all the intervals in the Sequence object **/
+    private double totalDuration;
+    private long timerStartTime;
+    private long timerPausedTime;
+    private boolean keepTimerRunning;
+    private boolean timerIsPaused = false;
+    /** Array of sound tasks and when to play them **/
+    private double[][] soundSchedule;
+    /** Keeps track of what sound we're supposed to play in the timer **/
+    private int soundIndex = 0;
 
     //  - Instance variable(s)
     Sequence sequence = new Sequence();
@@ -52,7 +69,7 @@ public class GUI extends Application {
     GraphicsContext gcBG;
     //      *** Sequence Editor components
     Label lblInterval;
-    ListView<String> lvInterval;
+    ListView<String> lvIntervals;
     Button btnAddInterval;
     Button btnMoveIntervalLeft;
     Button btnMoveIntervalRight;
@@ -60,29 +77,256 @@ public class GUI extends Application {
     Label lblDuration;
     TextField tfDuration;
     Button btnSetDuration;
-    Label lblDurationBackground;
     //      *** Sound options components
     ComboBox cbMainSound;
     Button btnPlayMainSound;
     ComboBox cbSecondSound;
     Button btnPlaySecondSound;
-    Label lblSounds;
-    Label lblSoundBackground;
+    Label lblPrimSound;
+    Label lblSecondSound;
     //      *** Progress Indicator
     ProgressIndicator piSessionStatus;
+    //      *** Control Timers
+    Button btnStartTimer;
+    Button btnPauseTimer; // maybe
+    Button btnStopTimer;
+    Button btnContinueTimer;
 
     // METHODS
+    //  - Timer methods
+    /**
+     * Starts the timer, whether it has come from pause or not
+     */
+    public void startTimer() {
+        // Was timer paused?
+        if (timerIsPaused) { // YES: then we can't over-write existing variables
+            // Timer is no longer paused
+            timerIsPaused = false;
+
+            // Calculate the new start time (to take into account the elapsed time)
+            long elapsedTime = timerPausedTime - timerStartTime;
+            timerStartTime = System.currentTimeMillis() - elapsedTime;
+
+            // Everything else should take up where it left off
+        } else { // NO: reset all variables
+            //  - set the start time
+            timerStartTime = System.currentTimeMillis();
+            //  - get the session's total duration
+            totalDuration = sequence.getTotalDuration() * 1000.0 * 60.0; // convert minutes to milliseconds: * 1000 milliseconds * 60 seconds
+            //  - set the soundIndex to 0
+            soundIndex = 0;
+
+            //  - We want to keep track of when to play sounds and whether a sound has been played or not
+            //  (soundSchedule[x][y] => x is the time when the sound should play, y is whether a sound has played or not
+            soundSchedule = new double[sequence.getSequenceArray().length][2];
+            double time = 0;
+            //      - rest of indexes:
+            for (int intervalIndex = 0; intervalIndex < sequence.getSequenceArray().length; intervalIndex++) {
+                time += sequence.getSequenceArray()[intervalIndex].getDuration() * 1000.0 * 60.0; // convert to milliseconds
+
+                soundSchedule[intervalIndex][0] = time;
+                soundSchedule[intervalIndex][1] = 0;
+            }
+        }
+
+        // The timer is now running
+        keepTimerRunning = true;
+
+        // Update the display
+        timerIsRunning();
+
+        // Timer thread
+        Thread timerThread = new Thread() {
+            public void run() {
+                boolean hasUpdatedProgress = false;
+                double lastProgressUpdate = 0;
+
+                // Always start of the timer with the main sound
+                String musicFile2 = Sound.getPathFromSoundList(sequence.getMainSoundName());
+                Media sound2 = new Media(new File(musicFile2).toURI().toString());
+                MediaPlayer mediaPlayer2 = new MediaPlayer(sound2);
+                new Thread() {
+                    public void run() {
+                        mediaPlayer2.play();
+                    }
+                }.start();
+
+                while (keepTimerRunning) {
+                    // 1) Progress checking
+                    double elapsedTime = (new Date()).getTime() - timerStartTime;
+                    double proportionComplete = elapsedTime / totalDuration;
+
+                    if (!hasUpdatedProgress) {
+                        updateSessionStatus(proportionComplete);
+                        hasUpdatedProgress = true;
+                    }
+
+                    if (lastProgressUpdate + 0.0025 <= proportionComplete) {
+                        hasUpdatedProgress = false; // we've updated for now
+                        lastProgressUpdate += 0.0025; // update the ProgressIndicator in 0.25% increments
+                    }
+
+                    // 2) Play a sound?
+                    // Are we at, or have we passed, a time when a sound should have been played?
+                    if (soundSchedule[soundIndex][0] <= elapsedTime) {
+                        // If yes, has this sound NOT been played?
+                        if (soundSchedule[soundIndex][1] == 0) {
+                            // If yes, which sound are we going to play?
+                            if (soundIndex == soundSchedule.length - 1) { // last = main sound
+
+                                String musicFile = Sound.getPathFromSoundList(sequence.getMainSoundName());
+                                Media sound = new Media(new File(musicFile).toURI().toString());
+                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
+                                new Thread() {
+                                    public void run() {
+                                        mediaPlayer.play();
+                                    }
+                                }.start();
+
+                                //sequence.playMainSound();
+                                System.out.println("-----MAIN SOUND");
+                            } else {
+
+                                String musicFile = Sound.getPathFromSoundList(sequence.getSecondarySoundName());
+                                Media sound = new Media(new File(musicFile).toURI().toString());
+                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
+                                new Thread() {
+                                    public void run() {
+                                        mediaPlayer.play();
+                                    }
+                                }.start();
+
+                                // sequence.playSecondarySound();
+                                System.out.println("-----SECONDARY SOUND");
+                            }
+
+                            // record that we've played the sound
+                            soundSchedule[soundIndex][1] = 1;
+                            soundIndex++;
+                        }
+                    }
+
+                    // 3) Check for exit or pause conditions
+                    //  - timer is done
+                    if (elapsedTime >= totalDuration) {
+                        keepTimerRunning = false;
+                    }
+                }
+                // Check to see if the Timer is paused
+                if (timerIsPaused) {
+                    timerIsPaused();
+                } else {
+                    timerIsStopped();
+                }
+            }
+        };
+        timerThread.start();
+    }
+    /**
+     * Stops the timer
+     */
+    public void stopTimer() {
+        keepTimerRunning = false;
+
+        if (timerIsPaused) {
+            timerIsPaused = false;
+            timerIsStopped();
+        }
+    }
+    /**
+     * Pauses the timer
+     */
+    public void pauseTimer() {
+        timerIsPaused = true;
+        timerPausedTime = System.currentTimeMillis();
+        keepTimerRunning = false;
+    }
+    /**
+     * Configures the display for when the timer is running
+     */
+    public void timerIsRunning() {
+        // Make things invisible
+        //  - edit buttons
+        btnAddInterval.setVisible(false);
+        btnDeleteInterval.setVisible(false);
+        btnMoveIntervalLeft.setVisible(false);
+        btnMoveIntervalRight.setVisible(false);
+        //  - draw the ListView
+        lvIntervals.setVisible(false);
+        //  - draw the duration editor
+        lblDuration.setVisible(false);
+        btnSetDuration.setVisible(false);
+        tfDuration.setVisible(false);
+        //  - draw the ListView label
+        lblInterval.setVisible(false);
+        //  - draw the Sound options (from the top)
+        //      *** primary sound
+        lblPrimSound.setVisible(false);
+        cbMainSound.setVisible(false);
+        btnPlayMainSound.setVisible(false);
+        //      *** secondary sound
+        lblSecondSound.setVisible(false);
+        cbSecondSound.setVisible(false);
+        btnPlaySecondSound.setVisible(false);
+        //  - draw the progress indicator
+        //      (progress indicator stays)
+        //  - timer controls
+        btnStartTimer.setVisible(false);
+        btnPauseTimer.setVisible(true);
+        btnStopTimer.setVisible(true);
+        btnContinueTimer.setVisible(false);
+    }
+    /**
+     * Configures the display for when the timer is stopped
+     */
+    public void timerIsStopped() {
+        // Make things invisible
+        //  - edit buttons
+        btnAddInterval.setVisible(true);
+        btnDeleteInterval.setVisible(true);
+        btnMoveIntervalLeft.setVisible(true);
+        btnMoveIntervalRight.setVisible(true);
+        //  - draw the ListView
+        lvIntervals.setVisible(true);
+        //  - draw the duration editor
+        lblDuration.setVisible(true);
+        btnSetDuration.setVisible(true);
+        tfDuration.setVisible(true);
+        //  - draw the ListView label
+        lblInterval.setVisible(true);
+        //  - draw the Sound options (from the top)
+        //      *** primary sound
+        lblPrimSound.setVisible(true);
+        cbMainSound.setVisible(true);
+        btnPlayMainSound.setVisible(true);
+        //      *** secondary sound
+        lblSecondSound.setVisible(true);
+        cbSecondSound.setVisible(true);
+        btnPlaySecondSound.setVisible(true);
+        //  - draw the progress indicator
+        piSessionStatus.setProgress(0);
+        //  - timer controls
+        btnStartTimer.setVisible(true);
+        btnPauseTimer.setVisible(false);
+        btnStopTimer.setVisible(false);
+    }
+    /**
+     * Configures the display for when the timer is paused
+     */
+    public void timerIsPaused() {
+        btnPauseTimer.setVisible(false);
+        btnContinueTimer.setVisible(true);
+    }
+
     //  - Helper methods
     /**
      * Gets an array, of the durations, of all intervals in the sequence
-     * @return
+     * @return an array of the durations of all intervals in the sequence
      */
     public String[] getSequenceViewerItems() {
-        // we subtract one from the length of the array because we don't want to display the final interval (it's just
-        //  a placeholder for final sound
-        String[] durations = new String[sequence.getSequenceArray().length - 1];
+        String[] durations = new String[sequence.getSequenceArray().length];
 
-        for (int index = 0; index < sequence.getSequenceArray().length - 1; index++) {
+        for (int index = 0; index < sequence.getSequenceArray().length; index++) {
             // durations[index] = "(" + (index + 1) + ")\n" + Double.toString(sequence.getSequenceArray()[index].getDuration()) + "\nmins";
             durations[index] = "Interval " + (index + 1) + ":\n" + Double.toString(sequence.getSequenceArray()[index].getDuration()) + "mins";
             System.out.print(durations[index] + " - ");
@@ -97,13 +341,14 @@ public class GUI extends Application {
      */
     public void updateSequenceViewer() {
         // Populate the ListView with the sequence array
-        lvInterval.setItems(FXCollections.observableArrayList(getSequenceViewerItems()));
+        lvIntervals.setItems(FXCollections.observableArrayList(getSequenceViewerItems()));
     }
-    public void updatePISessionStatus() {
-
+    public void updateSessionStatus(double proportionComplete) {
+        // Update the ProgressIndicator
+        piSessionStatus.setProgress(proportionComplete);
     }
     /**
-     * Draws all static graphical components
+     * Draws all static graphical components (to avoid cluttering the start method)
      */
     public void drawStaticComponents() {
         // Draws components bottom to top
@@ -115,32 +360,48 @@ public class GUI extends Application {
         btnMoveIntervalRight.relocate(MARGIN + PADDING + BUTTON_W, WINDOW_H - MARGIN - PADDING - COMP_H * 2);
         //  - draw the ListView
         final double LV_H = WINDOW_H - MARGIN - PADDING * 3 - COMP_H * 3;
-        lvInterval.relocate(MARGIN, LV_H);
+        lvIntervals.relocate(MARGIN, LV_H);
         //  - draw the duration editor
         final double DURATION_W = MARGIN + ((COMP_MAX_W - PADDING) * 0.75) + PADDING;
-        final double DURATION_H = LV_H - PADDING - lblInterval.getHeight();
-        lblDuration.setPrefHeight(lblInterval.getHeight());
-        lblDuration.relocate(DURATION_W, DURATION_H);
-        lblDurationBackground.setPrefHeight(PADDING * 2 + (COMP_H / 2) * 2 + lblDuration.getHeight());
-        lblDurationBackground.relocate(DURATION_W, DURATION_H);
-        btnSetDuration.relocate(DURATION_W, LV_H + COMP_H / 2 + PADDING);
-        tfDuration.relocate(DURATION_W, LV_H);
+        final double DURATION_H = LV_H - lblInterval.getHeight();
+        btnSetDuration.relocate(DURATION_W, LV_H);
+        tfDuration.relocate(DURATION_W, LV_H + COMP_H / 2 + PADDING);
+        lblDuration.relocate(DURATION_W, LV_H + COMP_H / 2 + MARGIN / 2 + tfDuration.getHeight());
         //  - draw the ListView label
         lblInterval.relocate(MARGIN, DURATION_H);
-        //  - draw the Sound options
-        lblSoundBackground.setPrefHeight(PADDING * 2 + (COMP_H / 2) * 2 + lblSounds.getHeight());
-        lblSoundBackground.relocate(MARGIN, DURATION_H - (COMP_H / 2) * 2 - PADDING * 3 - lblSounds.getHeight());
-        cbSecondSound.relocate(MARGIN, DURATION_H - COMP_H / 2 - PADDING * 1);
-        btnPlaySecondSound.relocate(MARGIN + BUTTON_W + PADDING, DURATION_H - COMP_H / 2 - PADDING * 1);
-        cbMainSound.relocate(MARGIN, DURATION_H - (COMP_H / 2) * 2 - PADDING * 2);
-        btnPlayMainSound.relocate(MARGIN + BUTTON_W + PADDING, DURATION_H - (COMP_H / 2) * 2 - PADDING * 2);
-        lblSounds.relocate(MARGIN, DURATION_H - (COMP_H / 2) * 2 - PADDING * 3 - lblSounds.getHeight());
+        //  - draw the Sound options (from the top)
+        //      *** primary sound
+        final double SOUND_W = (COMP_MAX_W) / 2 - PADDING * 1.5 - btnPlayMainSound.getWidth();
+        cbMainSound.setPrefWidth(SOUND_W);
+        cbMainSound.relocate(MARGIN, MARGIN);
+        btnPlayMainSound.relocate(WINDOW_W / 2 - PADDING / 2 - btnPlayMainSound.getWidth(), MARGIN);
+        lblPrimSound.relocate(MARGIN, MARGIN / 2 + cbMainSound.getHeight());
+        //      *** secondary sound
+        cbSecondSound.setPrefWidth(SOUND_W);
+        cbSecondSound.relocate(WINDOW_W / 2 + PADDING / 2, MARGIN);
+        btnPlaySecondSound.relocate(WINDOW_W - MARGIN - btnPlayMainSound.getWidth(), MARGIN);
+        lblSecondSound.relocate(WINDOW_W / 2 + PADDING / 2, MARGIN / 2 + cbSecondSound.getHeight());
         //  - draw the progress indicator
-        piSessionStatus.relocate(MARGIN, MARGIN);
+        final double PI_TOP_BOUND = MARGIN + PADDING + (COMP_H / 2) + lblPrimSound.getHeight();
+        final double PI_BOTTOM_BOUND = DURATION_H;
+        final double PI_Y_COORD = (PI_BOTTOM_BOUND - PI_TOP_BOUND - piSessionStatus.getHeight()) / 2 + PI_TOP_BOUND + PADDING;
+        piSessionStatus.relocate(MARGIN, PI_Y_COORD);
+        //  - timer controls
+        btnStartTimer.relocate((WINDOW_W - btnStartTimer.getWidth()) / 2, PI_Y_COORD + (piSessionStatus.getHeight()) / 2);
+        btnPauseTimer.relocate(MARGIN, WINDOW_H - MARGIN - btnPauseTimer.getHeight());
+        btnStopTimer.relocate(MARGIN, WINDOW_H - MARGIN - btnPauseTimer.getHeight() - PADDING - btnStopTimer.getHeight());
+        btnContinueTimer.relocate(MARGIN, WINDOW_H - MARGIN - btnPauseTimer.getHeight());
+        btnPauseTimer.setVisible(false);
+        btnStopTimer.setVisible(false);
+        btnContinueTimer.setVisible(false);
     }
 
     //  - Handler methods
     //      *** ...for the Sound components
+    /**
+     * Plays a sound when one of the play buttons have been pressed
+     * @param e MouseEvent
+     */
     private void playSoundHandler(MouseEvent e) {
         Object buttonPressed = e.getSource();
 
@@ -166,13 +427,21 @@ public class GUI extends Application {
             sequence.playSecondarySound();
         }
     }
+    public void setMainSoundHandler(Event e) {
+        int soundIndex = cbMainSound.getSelectionModel().getSelectedIndex();
+        sequence.setMainSound(Sound.getSoundList()[soundIndex]);
+    }
+    public void setSecondSoundHandler(Event e) {
+        int soundIndex = cbSecondSound.getSelectionModel().getSelectedIndex();
+        sequence.setSecondarySound(Sound.getSoundList()[soundIndex]);
+    }
     //      *** ...for the ListView and Duration editing components
     /**
      * Puts the duration of a selected Interval into the duration TextField
      * @param e MouseEvent
      */
     private void printDurationHandler(MouseEvent e) {
-        int index = lvInterval.getSelectionModel().getSelectedIndex();
+        int index = lvIntervals.getSelectionModel().getSelectedIndex();
         double duration = sequence.getSequenceArray()[index].getDuration();
 
         tfDuration.setText(Double.toString(duration));
@@ -191,7 +460,7 @@ public class GUI extends Application {
 
             // If the new duration is within the elements, then change the Interval's duration
             if (newDuration >= 0 && newDuration <= 120) {
-                int index = lvInterval.getSelectionModel().getSelectedIndex();
+                int index = lvIntervals.getSelectionModel().getSelectedIndex();
                 sequence.getSequenceArray()[index].setDuration(newDuration);
                 updateSequenceViewer();
             } else { // Throw exception because the duration is outside the limits
@@ -200,14 +469,14 @@ public class GUI extends Application {
             System.out.println("here 1");
         } catch (Exception exception) {
             // Just re-set the TextField to the Interval's original duration
-            int index = lvInterval.getSelectionModel().getSelectedIndex();
+            int index = lvIntervals.getSelectionModel().getSelectedIndex();
             double duration = sequence.getSequenceArray()[index].getDuration();
             System.out.println("here 2");
             tfDuration.setText(Double.toString(duration));
             updateSequenceViewer();
         }
     }
-    //      *** ...for the buttons
+    //      *** ...for editing buttons
     /**
      * Adds an Interval object to the end of the Sequence's Interval Array
      * @param e ActionEvent
@@ -222,7 +491,7 @@ public class GUI extends Application {
      * @param e ActionEvent
      */
     private void deleteIntervalHandler(ActionEvent e) {
-        sequence.deleteInterval(lvInterval.getSelectionModel().getSelectedIndex());
+        sequence.deleteInterval(lvIntervals.getSelectionModel().getSelectedIndex());
         updateSequenceViewer();
     }
     /**
@@ -230,7 +499,7 @@ public class GUI extends Application {
      * @param e ActionEvent
      */
     private void moveIntervalLeftHandler(ActionEvent e) {
-        sequence.moveIntervalLeft(lvInterval.getSelectionModel().getSelectedIndex());
+        sequence.moveIntervalLeft(lvIntervals.getSelectionModel().getSelectedIndex());
         updateSequenceViewer();
     }
     /**
@@ -238,12 +507,20 @@ public class GUI extends Application {
      * @param e ActionEvent
      */
     private void moveIntervalRightHandler(ActionEvent e) {
-        sequence.moveIntervalRight(lvInterval.getSelectionModel().getSelectedIndex());
+        sequence.moveIntervalRight(lvIntervals.getSelectionModel().getSelectedIndex());
         updateSequenceViewer();
     }
+    //      *** ...for the timer buttons
+    public void startTimerHandler(ActionEvent e) {
+        startTimer();
+    }
+    public void stopTimerHandler(ActionEvent e) {
+        stopTimer();
+    }
+    public void pauseTimerHandler(ActionEvent e) {
+        pauseTimer();
+    }
 
-    // TODO: Instance Variables for View Components and Model
-    // TODO: Private Event Handlers and Helper Methods
     /**
      * This is where you create your components and the model and add event
      * handlers.
@@ -255,7 +532,7 @@ public class GUI extends Application {
     public void start(Stage stage) throws Exception {
         Pane root = new Pane();
         Scene scene = new Scene(root, WINDOW_W, WINDOW_H); // size of the window
-        scene.getStylesheets().add("resources/css/defaultStyles.css");
+        scene.getStylesheets().add("resources/css/" + STYLE + ".css");
         stage.setTitle("Meditation and Prayer Timer"); // set the window title here
         stage.setScene(scene);
 
@@ -265,58 +542,60 @@ public class GUI extends Application {
         gcBG = canvasBG.getGraphicsContext2D();
         // CREATE the Sequence Editor objects
         //  - ListView of sequence intervals
-        lblInterval = new Label("SESSION INTERVALS");
-        lvInterval = new ListView<String>();
+        lblInterval = new Label("SESSION");
+        lvIntervals = new ListView<String>();
         //  - Duration editor components
-        lblDurationBackground = new Label("");
-        lblDuration = new Label("INTERVAL\nDURATION");
+        lblDuration = new Label("(duration)");
         tfDuration = new TextField();
         btnSetDuration = new Button("SET");
         //  - Sequence Editor buttons
         btnAddInterval = new Button("ADD");
-        btnMoveIntervalLeft = new Button ("\u2190 MOVE");
-        btnMoveIntervalRight = new Button ("MOVE \u2192");
+        btnMoveIntervalLeft = new Button ("\u25C0 MOVE");
+        btnMoveIntervalRight = new Button ("MOVE \u25B6");
         btnDeleteInterval = new Button ("DELETE");
         // CREATE Sound options
-        lblSoundBackground = new Label("");
         cbMainSound = new ComboBox(soundListMain);
         btnPlayMainSound = new Button ("\u25b6"); // play symbol
         cbSecondSound = new ComboBox(soundListSecond);
         btnPlaySecondSound = new Button ("\u25b6"); // play symbol
-        lblSounds = new Label ("INTERVAL SOUNDS");
+        lblPrimSound = new Label ("(primary sound)");
+        lblSecondSound = new Label ("(interval sound)");
         // CREATE Progress indicator
         piSessionStatus = new ProgressIndicator();
+        // CREATE Timer Controls
+        btnStartTimer = new Button("Begin Session");
+        btnPauseTimer = new Button("Pause Session");
+        btnStopTimer = new Button("Stop Session");
+        btnContinueTimer = new Button("Continue Session");
 
         // TODO: 3. Add components to the root
         //  - Background components
         root.getChildren().addAll(canvasBG);
         //  - Sequence Editor components
-        root.getChildren().addAll(lvInterval, lblInterval,
+        root.getChildren().addAll(lvIntervals, lblInterval,
                 btnAddInterval,btnMoveIntervalLeft, btnMoveIntervalRight, btnDeleteInterval,
-                lblDurationBackground, lblDuration, tfDuration, btnSetDuration);
+                lblDuration, tfDuration, btnSetDuration);
         //  - Sound options
-        root.getChildren().addAll(lblSoundBackground,
-                cbMainSound, btnPlayMainSound, cbSecondSound, btnPlaySecondSound, lblSounds);
-        //  - Progress indicator
-        root.getChildren().addAll(piSessionStatus);
+        root.getChildren().addAll(lblPrimSound, lblSecondSound,
+                cbMainSound, btnPlayMainSound, cbSecondSound, btnPlaySecondSound);
+        //  - Progress indicator and Timer Controls
+        root.getChildren().addAll(piSessionStatus, btnStartTimer, btnPauseTimer, btnStopTimer, btnContinueTimer);
 
         // TODO: 4. Configure the components (colors, fonts, size, location)
         // CONFIGURE the background
-        gcBG.drawImage(new Image("resources/images/background.png"), 0, 0, WINDOW_W, WINDOW_H);
+        gcBG.drawImage(new Image("resources/images/" + STYLE + "/background.png"), 0, 0, WINDOW_W, WINDOW_H);
         // CONFIGURE the Sequence Editor objects
         //  - ListView of sequence intervals
         lblInterval.setMaxWidth((COMP_MAX_W - PADDING) * 0.75);
         lblInterval.setPrefWidth((COMP_MAX_W - PADDING) * 0.75);
-        lblInterval.setAlignment(Pos.CENTER);
-        lvInterval.setPrefWidth((COMP_MAX_W - PADDING) * 0.75);
-        lvInterval.setPrefHeight(COMP_H + PADDING);
-        lvInterval.setOrientation(Orientation.HORIZONTAL);
+        lblInterval.setAlignment(Pos.BASELINE_LEFT);
+        lvIntervals.setPrefWidth((COMP_MAX_W - PADDING) * 0.75);
+        lvIntervals.setPrefHeight(COMP_H + PADDING);
+        lvIntervals.setOrientation(Orientation.HORIZONTAL);
         //  - Duration editor components
-        lblDurationBackground.setPrefWidth((COMP_MAX_W - PADDING) * 0.25);
-        lblDurationBackground.getStyleClass().add("label-background");
         lblDuration.getStyleClass().add("secondary-label");
         lblDuration.setPrefWidth((COMP_MAX_W - PADDING) * 0.25);
-        lblDuration.setAlignment(Pos.BOTTOM_CENTER);
+        lblDuration.setAlignment(Pos.BASELINE_LEFT);
         tfDuration.setPrefWidth((COMP_MAX_W - PADDING) * 0.25);
         tfDuration.setPrefHeight(COMP_H / 2);
         tfDuration.setText("slct an ntrvl");
@@ -337,38 +616,55 @@ public class GUI extends Application {
         btnMoveIntervalRight.getStyleClass().add("button-move-r");
         btnMoveIntervalRight.setAlignment(Pos.BOTTOM_LEFT);
         // CONFIGURE Sound options
-        final double SOUND_MAX_W = ((COMP_MAX_W - PADDING * 2) * 0.75) / 2 + PADDING + COMP_H / 2;
-        lblSoundBackground.setPrefWidth(SOUND_MAX_W);
-        lblSoundBackground.getStyleClass().add("label-background");
         cbMainSound.setVisibleRowCount(4);
-        cbMainSound.setPrefSize(((COMP_MAX_W - PADDING * 2) * 0.75) / 2, COMP_H / 2);
+        cbMainSound.setPrefHeight(COMP_H / 2);
         cbSecondSound.setVisibleRowCount(4);
-        cbSecondSound.setPrefSize(((COMP_MAX_W - PADDING * 2) * 0.75) / 2, COMP_H / 2);
+        cbSecondSound.setPrefHeight(COMP_H / 2);
         cbSecondSound.getSelectionModel().select(Sound.getSoundIndex(secondSound));
         cbMainSound.getSelectionModel().select(Sound.getSoundIndex(mainSound));
         btnPlayMainSound.setPrefSize(COMP_H / 2, COMP_H / 2);
         btnPlayMainSound.getStyleClass().add("button-play");
         btnPlaySecondSound.setPrefSize(COMP_H / 2, COMP_H / 2);
         btnPlaySecondSound.getStyleClass().add("button-play");
-        lblSounds.setPrefSize(SOUND_MAX_W, COMP_H / 2);
-        lblSounds.getStyleClass().add("secondary-label");
-        lblSounds.setAlignment(Pos.BOTTOM_CENTER);
+        lblPrimSound.setPrefSize((COMP_MAX_W - PADDING) / 2,COMP_H / 2 - PADDING / 2);
+        lblPrimSound.getStyleClass().add("secondary-label");
+        lblPrimSound.setAlignment(Pos.BASELINE_LEFT);
+        lblSecondSound.setPrefSize((COMP_MAX_W - PADDING) / 2,COMP_H / 2 - PADDING / 2);
+        lblSecondSound.getStyleClass().add("secondary-label");
+        lblSecondSound.setAlignment(Pos.BASELINE_LEFT);
         // CONFIGURE Progress indicator
-        piSessionStatus.setProgress(0.1);
+        piSessionStatus.setProgress(0);
         piSessionStatus.setPrefSize(COMP_MAX_W, COMP_MAX_W * 0.75);
+        // CONFIGURE Timer Controls
+        btnStartTimer.getStyleClass().add("button-timer-start");
+        btnStartTimer.setPrefSize(COMP_MAX_W, COMP_H);
+        btnPauseTimer.getStyleClass().add("button-timer-control");
+        btnPauseTimer.setPrefSize(COMP_MAX_W, COMP_H);
+        btnStopTimer.getStyleClass().add("button-timer-control");
+        btnStopTimer.setPrefSize(COMP_MAX_W, COMP_H);
+        btnStopTimer.getStyleClass().add("button-timer-control");
+        btnContinueTimer.setPrefSize(COMP_MAX_W, COMP_H);
+        btnContinueTimer.getStyleClass().add("button-timer-control");
 
         // TODO: 5. Add Event Handlers and do final setup
         //  - Sound handlers
+        cbMainSound.setOnAction(this::setMainSoundHandler);
+        cbSecondSound.setOnAction(this::setSecondSoundHandler);
         btnPlayMainSound.setOnMouseClicked(this::playSoundHandler);
         btnPlaySecondSound.setOnMouseClicked(this::playSoundHandler);
         //  - Sequence Editor ListView and Duration editing handlers
-        lvInterval.setOnMouseClicked(this::printDurationHandler);
+        lvIntervals.setOnMouseClicked(this::printDurationHandler);
         btnSetDuration.setOnAction(this::editDurationHandler);
         //  - Sequence Editor button handlers
         btnAddInterval.setOnAction(this::addIntervalHandler);
         btnDeleteInterval.setOnAction(this::deleteIntervalHandler);
         btnMoveIntervalLeft.setOnAction(this::moveIntervalLeftHandler);
         btnMoveIntervalRight.setOnAction(this::moveIntervalRightHandler);
+        //  - Timer button handlers
+        btnStartTimer.setOnAction(this::startTimerHandler);
+        btnStopTimer.setOnAction(this::stopTimerHandler);
+        btnPauseTimer.setOnAction(this::pauseTimerHandler);
+        btnContinueTimer.setOnAction(this::startTimerHandler);
 
         // TODO: 6. Show the stage
         stage.show();
@@ -377,7 +673,6 @@ public class GUI extends Application {
         Thread.sleep(1000);
         drawStaticComponents();
         updateSequenceViewer();
-        updatePISessionStatus();
     }
 
     /**
