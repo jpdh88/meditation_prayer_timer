@@ -1,2 +1,14 @@
 # Default ignored files
 /workspace.xml
+/.
+/artifacts/
+/.gitignore
+/compiler.xml
+/description.html
+/encodings.xml
+/gradle.xml
+/misc.xml
+/modules.xml
+/uiDesigner.xml
+/vcs.xml
+/workspace.xml
