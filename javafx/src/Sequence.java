@@ -251,7 +251,7 @@ public class Sequence {
 
             // Is there a default profile?
             try {
-                defaultProfile = Integer.parseInt(property.getProperty("default-profile"));
+                defaultProfile = Integer.parseInt(property.getProperty("default_profile"));
             } catch (Exception e) { // there is no default profile: use the program default
                 defaultProfile = 0;
             }
@@ -273,11 +273,15 @@ public class Sequence {
             Properties property = new Properties();
 
             // set the properties values
-            property.setProperty("default-profile", index + "");
+            property.setProperty("default_profile", Integer.toString(index));
+
+            // save properties to project root folder
+            property.store(output, null);
 
         } catch (IOException io) {
             System.out.println("Sequence Class Error: problem reading file");
         }
+
     }
 
     /**
@@ -357,7 +361,7 @@ public class Sequence {
                 property.setProperty("main_sound", mainSound.getSoundName()); // the main sound
                 property.setProperty("secondary_sound", secondarySound.getSoundName()); // the secondary sound
 
-                property.setProperty("num_intervals", Double.toString(intervalArrayList.size()));
+                property.setProperty("num_intervals", Integer.toString(intervalArrayList.size()));
                 for (int intervalIndex = 0; intervalIndex < intervalArrayList.size(); intervalIndex++) {
                     property.setProperty("interval-" + intervalIndex, Double.toString(intervalArrayList.get(intervalIndex).getDuration()));
                 }
@@ -456,31 +460,6 @@ public class Sequence {
     }
 
     // *** Utility method(s)
-    /**
-     * Plays the main sound
-     */
-    public void playMainSound() {
-            Sound.playSound(mainSound.getSoundStream());
-    }
-    /**
-     * Plays the secondary sound
-     */
-    public void playSecondarySound() {
-            Sound.playSound(secondarySound.getSoundStream());
-    }
-    /**
-     * Plays the main sound using JavaFX tools
-     */
-    public void playMainSoundJFX() {
-        Sound.playSoundJFX(mainSound.getSoundName());
-    }
-    /**
-     * Plays the secondary sound using JavaFX tools
-     */
-    public void playSecondarySoundJFX() {
-        Sound.playSoundJFX(secondarySound.getSoundName());
-    }
-
     /**
      * toString method
      * @return Returns a String of the Object's variables
