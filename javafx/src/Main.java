@@ -37,6 +37,8 @@ import java.util.Date;
  */
 public class Main extends Application {
     // VARIABLES
+    /** Absolute path of the program **/
+    String absPath;
     //  - Window and graphics dimensions
     /** The GUI style that will be used **/
     private final String STYLE = "style1"; // style1, style2, or style3
@@ -167,14 +169,15 @@ public class Main extends Application {
                 double lastProgressUpdate = 0;
 
                 // Always start of the timer with the main sound
-                String musicFile2 = Sound.getPathFromSoundList(sequence.getMainSoundName());
+                Sound.playSound(sequence.getMainSoundName());
+                /*String musicFile2 = Sound.getPathFromSoundList(sequence.getMainSoundName());
                 Media sound2 = new Media(new File(musicFile2).toURI().toString());
                 MediaPlayer mediaPlayer2 = new MediaPlayer(sound2);
                 new Thread() {
                     public void run() {
                         mediaPlayer2.play();
                     }
-                }.start();
+                }.start();*/
 
                 while (keepTimerRunning) {
                     // 1) Progress checking
@@ -199,29 +202,11 @@ public class Main extends Application {
                             // If yes, which sound are we going to play?
                             if (soundIndex == soundSchedule.length - 1) { // last = main sound
 
-                                String musicFile = Sound.getPathFromSoundList(sequence.getMainSoundName());
-                                Media sound = new Media(new File(musicFile).toURI().toString());
-                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
-                                new Thread() {
-                                    public void run() {
-                                        mediaPlayer.play();
-                                    }
-                                }.start();
-
-                                //sequence.playMainSound();
+                                Sound.playSound(sequence.getMainSoundName());
                                 System.out.println("-----MAIN SOUND");
                             } else {
 
-                                String musicFile = Sound.getPathFromSoundList(sequence.getSecondarySoundName());
-                                Media sound = new Media(new File(musicFile).toURI().toString());
-                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
-                                new Thread() {
-                                    public void run() {
-                                        mediaPlayer.play();
-                                    }
-                                }.start();
-
-                                // sequence.playSecondarySound();
+                                Sound.playSound(sequence.getSecondarySoundName());
                                 System.out.println("-----SECONDARY SOUND");
                             }
 
@@ -252,11 +237,8 @@ public class Main extends Application {
      */
     public void stopTimer() {
         keepTimerRunning = false;
-
-        if (timerIsPaused) {
-            timerIsPaused = false;
-            timerIsStopped();
-        }
+        timerIsPaused = false;
+        timerIsStopped();
     }
     /**
      * Pauses the timer
@@ -391,7 +373,7 @@ public class Main extends Application {
                 // ... get the date it was saved
                 output += " (saved " + sequence.getProfileDateSaved(profileIndex) + ")";
             }
-                if (profileIndex == sequence.getDefaultProfile()) {
+            if (profileIndex == sequence.getDefaultProfile()) { // this is the default profile
                 output += " (Default)";
             }
 
@@ -546,7 +528,7 @@ public class Main extends Application {
             sequence.setMainSound(soundName);
 
             // Play the sound
-            sequence.playMainSound();
+            Sound.playSound(sequence.getMainSoundName());
         } else if (buttonPressed == btnPlaySecondSound) {
             // Find the index (in the ListView) of the sound chosen by the user
             int soundIndex = cbSecondSound.getSelectionModel().getSelectedIndex();
@@ -556,7 +538,7 @@ public class Main extends Application {
             sequence.setSecondarySound(soundName);
 
             // Play the sound
-            sequence.playSecondarySound();
+            Sound.playSound(sequence.getSecondarySoundName());
         }
     }
     /**
@@ -703,11 +685,6 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
-
-        for (String each: getProfiles()) {
-            System.out.println(each);
-        }
-
         Pane root = new Pane();
         Scene scene = new Scene(root, WINDOW_W, WINDOW_H); // size of the window
         scene.getStylesheets().add("resources/css/" + STYLE + ".css");
@@ -769,7 +746,7 @@ public class Main extends Application {
 
         // TODO: 4. Configure the components (colors, fonts, size, location)
         // CONFIGURE the background
-        gcBG.drawImage(new Image("resources/images/" + STYLE + "/background.png"), 0, 0, WINDOW_W, WINDOW_H);
+        gcBG.drawImage(new Image("/resources/images/" + STYLE + "/background.png"), 0, 0, WINDOW_W, WINDOW_H);
         // CONFIGURE the Profile components
         double PROF_H = COMP_H / 2;
         cbProfiles.setPrefHeight(COMP_H / 2);
