@@ -685,6 +685,16 @@ public class GUI extends Application {
         pauseTimer();
     }
 
+    // JFX STUFF
+    /**
+     * Make no changes here.
+     *
+     * @param args unused
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     /**
      * Main start method
      *
@@ -865,14 +875,5 @@ public class GUI extends Application {
         drawStaticComponents();
         updateProfilesGraphics();
         updateIntervalsGraphics();
-    }
-
-    /**
-     * Make no changes here.
-     *
-     * @param args unused
-     */
-    public static void main(String[] args) {
-        launch(args);
     }
 }
