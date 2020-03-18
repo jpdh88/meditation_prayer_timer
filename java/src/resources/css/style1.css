@@ -53,6 +53,15 @@
         -fx-font-size: 15;
     }
 
+    .button-profile {
+        -fx-background-image: url('/resources/images/style1/button-set.png');
+        -fx-border-color: rgba(83, 56, 25, 0.8);
+        -fx-border-width: 1;
+        -fx-padding: 0;
+
+        -fx-font-size: 12;
+    }
+
     .button-timer-start {
         -fx-background-color: rgba(255, 255, 255, 0.4);
         -fx-border-width: 0;
@@ -190,5 +199,5 @@
     -fx-border-width: 3;
 }
 .progress-indicator .percentage {
-    /* -fx-fill: null; */
+    -fx-fill: rgba(83, 56, 25, 0.8);
 }

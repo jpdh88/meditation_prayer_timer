@@ -27,6 +27,7 @@ import java.util.Date;
  *  - shorten the lengths of the sound clips (as short as possible)
  *  - _actually_ encapsulate the array returned by Sequence
  *      - this will require changing several methods
+ *  - create variable in Sequence for "current Profile" => integrate this
  *
  * Style1 image: https://www.pexels.com/@zhangkaiyv
  * Style2 image: https://www.pexels.com/@punchbrandstock
@@ -70,9 +71,11 @@ public class GUI extends Application {
     //  - Instance variable(s)
     /** The Sequence object to keep track of the intervals **/
     Sequence sequence = new Sequence();
-    /** ObservableList of Main sounds (for the ListView) **/
+    /** ObservableList of Profiles (for the combobox) **/
+    ObservableList profilesList = FXCollections.observableArrayList(getProfiles());
+    /** ObservableList of Main sounds (for the combobox) **/
     ObservableList soundListMain = FXCollections.observableArrayList(Sound.getSoundList());
-    /** ObservableList of Secondary sounds (for the ListView) **/
+    /** ObservableList of Secondary sounds (for the combobox) **/
     ObservableList soundListSecond = FXCollections.observableArrayList(Sound.getSoundList());
     /** The main sound to be used (can be changed by user) **/
     String mainSound = sequence.getMainSoundName();
@@ -90,9 +93,15 @@ public class GUI extends Application {
     Button btnMoveIntervalLeft;
     Button btnMoveIntervalRight;
     Button btnDeleteInterval;
-    Label lblDuration;
     TextField tfDuration;
     Button btnSetDuration;
+    //      *** Profile components
+    ComboBox cbProfiles;
+    Button btnLoadProfile;
+    Button btnSaveProfile;
+    Button btnDeleteProfile;
+    Button btnSetDefaultProfile;
+    Label lblProfiles;
     //      *** Sound options components
     ComboBox cbMainSound;
     Button btnPlayMainSound;
@@ -173,7 +182,7 @@ public class GUI extends Application {
                     double proportionComplete = elapsedTime / totalDuration;
 
                     if (!hasUpdatedProgress) {
-                        updateSessionStatus(proportionComplete);
+                        updateProgressIndicator(proportionComplete);
                         hasUpdatedProgress = true;
                     }
 
@@ -267,15 +276,14 @@ public class GUI extends Application {
         btnDeleteInterval.setVisible(false);
         btnMoveIntervalLeft.setVisible(false);
         btnMoveIntervalRight.setVisible(false);
-        //  - draw the ListView
+        //  - ListView
         lvIntervals.setVisible(false);
-        //  - draw the duration editor
-        lblDuration.setVisible(false);
+        //  - duration editor
         btnSetDuration.setVisible(false);
         tfDuration.setVisible(false);
-        //  - draw the ListView label
+        //  - ListView label
         lblInterval.setVisible(false);
-        //  - draw the Sound options (from the top)
+        //  - Sound options (from the top)
         //      *** primary sound
         lblPrimSound.setVisible(false);
         cbMainSound.setVisible(false);
@@ -284,8 +292,15 @@ public class GUI extends Application {
         lblSecondSound.setVisible(false);
         cbSecondSound.setVisible(false);
         btnPlaySecondSound.setVisible(false);
-        //  - draw the progress indicator
+        //  - progress indicator
         //      (progress indicator stays)
+        //  - profiles components
+        cbProfiles.setVisible(false);
+        btnDeleteProfile.setVisible(false);
+        btnLoadProfile.setVisible(false);
+        btnSaveProfile.setVisible(false);
+        btnSetDefaultProfile.setVisible(false);
+        lblProfiles.setVisible(false);
         //  - timer controls
         btnStartTimer.setVisible(false);
         btnPauseTimer.setVisible(true);
@@ -305,7 +320,6 @@ public class GUI extends Application {
         //  - draw the ListView
         lvIntervals.setVisible(true);
         //  - draw the duration editor
-        lblDuration.setVisible(true);
         btnSetDuration.setVisible(true);
         tfDuration.setVisible(true);
         //  - draw the ListView label
@@ -321,10 +335,18 @@ public class GUI extends Application {
         btnPlaySecondSound.setVisible(true);
         //  - draw the progress indicator
         piSessionStatus.setProgress(0);
+        //  - profiles components
+        cbProfiles.setVisible(true);
+        btnDeleteProfile.setVisible(true);
+        btnLoadProfile.setVisible(true);
+        btnSaveProfile.setVisible(true);
+        btnSetDefaultProfile.setVisible(true);
+        lblProfiles.setVisible(true);
         //  - timer controls
         btnStartTimer.setVisible(true);
         btnPauseTimer.setVisible(false);
         btnStopTimer.setVisible(false);
+        btnContinueTimer.setVisible(false);
     }
     /**
      * Configures the display for when the timer is paused
@@ -339,7 +361,7 @@ public class GUI extends Application {
      * Gets an array, of the durations, of all intervals in the sequence
      * @return an array of the durations of all intervals in the sequence
      */
-    public String[] getSequenceViewerItems() {
+    public String[] getIntervalsForListView() {
         String[] durations = new String[sequence.getSequenceArray().length];
 
         for (int index = 0; index < sequence.getSequenceArray().length; index++) {
@@ -351,59 +373,148 @@ public class GUI extends Application {
 
         return durations;
     }
-    //  - Graphic methods
+
     /**
-     * Draws (or re-draws) the "Sequence Editor" components
+     * Gets an array of profiles, formatted for the cbProfiles drop-down box
+     * @return an array of profiles formatted for the cbProfiles drop-down box
      */
-    public void updateSequenceViewer() {
-        // Populate the ListView with the sequence array
-        lvIntervals.setItems(FXCollections.observableArrayList(getSequenceViewerItems()));
+    public String[] getProfiles() {
+        String[] profiles = new String[sequence.getProfiles().length];
+
+        // First profile is Program Default
+        profiles[0] = "Program Default";
+        for (int profileIndex = 1; profileIndex < profiles.length; profileIndex++) {
+
+            String output = "Profile " + profileIndex;
+
+            if (sequence.getProfiles()[profileIndex]) { // this is a saved profile
+                // ... get the date it was saved
+                output += " (saved " + sequence.getProfileDateSaved(profileIndex) + ")";
+            }
+                if (profileIndex == sequence.getDefaultProfile()) {
+                output += " (Default)";
+            }
+
+            profiles[profileIndex] = output;
+        }
+
+        return profiles;
     }
     /**
-     * Updates the ProgressIndicator
+     * Loads the profile selected by the user and updates the relevant components
+     */
+    public void loadProfile() {
+        sequence.loadProfile(cbProfiles.getSelectionModel().getSelectedIndex());
+        updateProfilesGraphics();
+        updateIntervalsGraphics();
+        updateSoundsGraphics();
+    }
+    /**
+     * Saves the profile created by the user and updates the relevant components
+     */
+    public void saveProfile() {
+        sequence.saveProfile(cbProfiles.getSelectionModel().getSelectedIndex());
+        updateProfilesGraphics();
+    }
+    /**
+     * Deletes the profile selected by the user and updates the relevant components
+     */
+    public void deleteProfile() {
+        int profileToDelete = cbProfiles.getSelectionModel().getSelectedIndex();
+
+        // If the user is deleting their default profile we will make the Program Default the new default
+        if (profileToDelete == sequence.getDefaultProfile()) {
+            sequence.setDefaultProfile(0);
+        }
+
+        sequence.deleteProfile(profileToDelete);
+        updateProfilesGraphics();
+    }
+    public void setDefaultProfile() {
+        // set the currently selected profile to default
+        sequence.setDefaultProfile(cbProfiles.getSelectionModel().getSelectedIndex());
+        // in case it hasn't been loaded already
+        loadProfile();
+    }
+
+    //  - Graphic methods
+    /**
+     * Draws (or re-draws) the "Sequence Editor" components (used to update display)
+     */
+    public void updateIntervalsGraphics() {
+        // Populate the ListView with the sequence array
+        lvIntervals.setItems(FXCollections.observableArrayList(getIntervalsForListView()));
+    }
+    /**
+     * Updates the profiles combo boxes (used to update display)
+     */
+    public void updateProfilesGraphics() {
+        cbProfiles.setItems(FXCollections.observableArrayList(getProfiles()));
+    }
+    /**
+     * Updates the sound combo boxes  (used to update display)
+     */
+    public void updateSoundsGraphics() {
+        cbMainSound.getSelectionModel().select(Sound.getSoundIndex(sequence.getMainSoundName()));
+        cbSecondSound.getSelectionModel().select(Sound.getSoundIndex(sequence.getSecondarySoundName()));
+    }
+    /**
+     * Updates the ProgressIndicator (only used by timer methods)
      * @param proportionComplete What proportion of the total duration has been completed
      */
-    public void updateSessionStatus(double proportionComplete) {
+    public void updateProgressIndicator(double proportionComplete) {
         // Update the ProgressIndicator
         piSessionStatus.setProgress(proportionComplete);
     }
+
     /**
      * Draws all static graphical components (to avoid cluttering the start method)
      */
     public void drawStaticComponents() {
         // Draws components bottom to top
-        //  - draw the buttons
-        final double BUTTON_W = ((COMP_MAX_W - PADDING * 2) * 0.75) / 2;
-        btnAddInterval.relocate(MARGIN, WINDOW_H - MARGIN - COMP_H);
-        btnDeleteInterval.relocate(MARGIN + PADDING + BUTTON_W, WINDOW_H - MARGIN - COMP_H);
-        btnMoveIntervalLeft.relocate(MARGIN, WINDOW_H - MARGIN - PADDING - COMP_H * 2);
-        btnMoveIntervalRight.relocate(MARGIN + PADDING + BUTTON_W, WINDOW_H - MARGIN - PADDING - COMP_H * 2);
-        //  - draw the ListView
-        final double LV_H = WINDOW_H - MARGIN - PADDING * 3 - COMP_H * 3;
-        lvIntervals.relocate(MARGIN, LV_H);
-        //  - draw the duration editor
-        final double DURATION_W = MARGIN + ((COMP_MAX_W - PADDING) * 0.75) + PADDING;
-        final double DURATION_H = LV_H - lblInterval.getHeight();
-        btnSetDuration.relocate(DURATION_W, LV_H);
-        tfDuration.relocate(DURATION_W, LV_H + COMP_H / 2 + PADDING);
-        lblDuration.relocate(DURATION_W, LV_H + COMP_H / 2 + MARGIN / 2 + tfDuration.getHeight());
-        //  - draw the ListView label
-        lblInterval.relocate(MARGIN, DURATION_H);
-        //  - draw the Sound options (from the top)
+        //  - draw the Sound options
         //      *** primary sound
         final double SOUND_W = (COMP_MAX_W) / 2 - PADDING * 1.5 - btnPlayMainSound.getWidth();
         cbMainSound.setPrefWidth(SOUND_W);
-        cbMainSound.relocate(MARGIN, MARGIN);
-        btnPlayMainSound.relocate(WINDOW_W / 2 - PADDING / 2 - btnPlayMainSound.getWidth(), MARGIN);
-        lblPrimSound.relocate(MARGIN, MARGIN / 2 + cbMainSound.getHeight());
+        cbMainSound.relocate(MARGIN, WINDOW_H - lblPrimSound.getHeight() - COMP_H / 2);
+        lblPrimSound.relocate(MARGIN, WINDOW_H - COMP_H / 2);
+        btnPlayMainSound.relocate(WINDOW_W / 2 - PADDING / 2 - btnPlayMainSound.getWidth(), WINDOW_H - lblPrimSound.getHeight() - COMP_H / 2);
         //      *** secondary sound
         cbSecondSound.setPrefWidth(SOUND_W);
-        cbSecondSound.relocate(WINDOW_W / 2 + PADDING / 2, MARGIN);
-        btnPlaySecondSound.relocate(WINDOW_W - MARGIN - btnPlayMainSound.getWidth(), MARGIN);
-        lblSecondSound.relocate(WINDOW_W / 2 + PADDING / 2, MARGIN / 2 + cbSecondSound.getHeight());
+        cbSecondSound.relocate(WINDOW_W / 2 + PADDING / 2, WINDOW_H - lblPrimSound.getHeight() - COMP_H / 2);
+        lblSecondSound.relocate(WINDOW_W / 2 + PADDING / 2, WINDOW_H - COMP_H / 2);
+        btnPlaySecondSound.relocate(WINDOW_W - MARGIN - btnPlayMainSound.getWidth(), WINDOW_H - lblPrimSound.getHeight() - COMP_H / 2);
+        final double SOUND_TOP = WINDOW_H - lblPrimSound.getHeight() - COMP_H / 2;
+        //  - draw the buttons
+        final double BUTTON_W = ((COMP_MAX_W - PADDING * 2) * 0.75) / 2;
+        btnAddInterval.relocate(MARGIN, SOUND_TOP - PADDING - COMP_H);
+        btnDeleteInterval.relocate(MARGIN + COMP_MAX_W / 2 + PADDING / 2, SOUND_TOP - PADDING - COMP_H);
+        btnMoveIntervalLeft.relocate(MARGIN, SOUND_TOP - PADDING * 2 - COMP_H * 2);
+        btnMoveIntervalRight.relocate(MARGIN + COMP_MAX_W / 2 + PADDING / 2, SOUND_TOP - PADDING * 2 - COMP_H * 2);
+        final double BUTTONS_TOP = SOUND_TOP - PADDING * 2 - COMP_H * 2;
+        //  - draw the ListView
+        lvIntervals.relocate(MARGIN, BUTTONS_TOP - lvIntervals.getHeight() - PADDING);
+        final double LV_TOP = BUTTONS_TOP - PADDING * 2 - COMP_H;
+        //  - draw the duration editor
+        final double DURATION_W = MARGIN + ((COMP_MAX_W - PADDING) * 0.75) + PADDING;
+        btnSetDuration.relocate(DURATION_W, LV_TOP);
+        tfDuration.relocate(DURATION_W, LV_TOP + btnSetDuration.getHeight() + PADDING);
+        //  - draw the main label
+        lblInterval.relocate(MARGIN, LV_TOP - lblInterval.getHeight());
+        final double SETTINGS_TOP = LV_TOP - lblInterval.getHeight();
+        // CONFIGURE the Profile components
+        cbProfiles.setPrefWidth(COMP_MAX_W - btnLoadProfile.getWidth() - PADDING * 3 - btnSaveProfile.getWidth() - btnDeleteProfile.getWidth());
+        cbProfiles.relocate(MARGIN, MARGIN);
+        btnLoadProfile.relocate(WINDOW_W - MARGIN - btnDeleteProfile.getWidth() - PADDING - btnSaveProfile.getWidth() - PADDING - btnLoadProfile.getWidth(), MARGIN);
+        btnSaveProfile.relocate(WINDOW_W - MARGIN - btnDeleteProfile.getWidth() - PADDING - btnSaveProfile.getWidth(), MARGIN);
+        btnDeleteProfile.relocate(WINDOW_W - MARGIN - btnDeleteProfile.getWidth(), MARGIN);
+        btnSetDefaultProfile.setPrefWidth(btnLoadProfile.getWidth() + PADDING + btnSaveProfile.getWidth() + PADDING + btnDeleteProfile.getWidth());
+        btnSetDefaultProfile.relocate(WINDOW_W - MARGIN - btnDeleteProfile.getWidth() - PADDING - btnSaveProfile.getWidth() - PADDING - btnLoadProfile.getWidth(), MARGIN + btnDeleteProfile.getHeight() + PADDING);
+        lblProfiles.relocate(MARGIN, MARGIN + COMP_H / 2);
+        final double PROFILE_TOP = LV_TOP - PADDING - COMP_H / 2;
         //  - draw the progress indicator
-        final double PI_TOP_BOUND = MARGIN + PADDING + (COMP_H / 2) + lblPrimSound.getHeight();
-        final double PI_BOTTOM_BOUND = DURATION_H;
+        final double PI_TOP_BOUND = MARGIN + COMP_H / 2;
+        final double PI_BOTTOM_BOUND = SETTINGS_TOP;
         final double PI_Y_COORD = (PI_BOTTOM_BOUND - PI_TOP_BOUND - piSessionStatus.getHeight()) / 2 + PI_TOP_BOUND + PADDING;
         piSessionStatus.relocate(MARGIN, PI_Y_COORD);
         //  - timer controls
@@ -474,7 +585,7 @@ public class GUI extends Application {
         double duration = sequence.getSequenceArray()[index].getDuration();
 
         tfDuration.setText(Double.toString(duration));
-        updateSequenceViewer();
+        updateIntervalsGraphics();
     }
     /**
      * Handler: Edits an interval's duration
@@ -491,18 +602,16 @@ public class GUI extends Application {
             if (newDuration >= 0 && newDuration <= 120) {
                 int index = lvIntervals.getSelectionModel().getSelectedIndex();
                 sequence.getSequenceArray()[index].setDuration(newDuration);
-                updateSequenceViewer();
+                updateIntervalsGraphics();
             } else { // Throw exception because the duration is outside the limits
                 throw new Exception();
             }
-            System.out.println("here 1");
         } catch (Exception exception) {
             // Just re-set the TextField to the Interval's original duration
             int index = lvIntervals.getSelectionModel().getSelectedIndex();
             double duration = sequence.getSequenceArray()[index].getDuration();
-            System.out.println("here 2");
             tfDuration.setText(Double.toString(duration));
-            updateSequenceViewer();
+            updateIntervalsGraphics();
         }
     }
     //      *** ...for editing buttons
@@ -513,7 +622,7 @@ public class GUI extends Application {
     private void addIntervalHandler(ActionEvent e) {
         // Default duration = 10 minutes
         sequence.addInterval(10);
-        updateSequenceViewer();
+        updateIntervalsGraphics();
     }
     /**
      * Handler: Deletes an Interval object from the Sequence's Interval Array
@@ -521,7 +630,7 @@ public class GUI extends Application {
      */
     private void deleteIntervalHandler(ActionEvent e) {
         sequence.deleteInterval(lvIntervals.getSelectionModel().getSelectedIndex());
-        updateSequenceViewer();
+        updateIntervalsGraphics();
     }
     /**
      * Handler: Moves an Interval object to the left (swaps it with the Interval directly to its left)
@@ -529,7 +638,7 @@ public class GUI extends Application {
      */
     private void moveIntervalLeftHandler(ActionEvent e) {
         sequence.moveIntervalLeft(lvIntervals.getSelectionModel().getSelectedIndex());
-        updateSequenceViewer();
+        updateIntervalsGraphics();
     }
     /**
      * Handler: Moves an Interval object to the right (swaps it with the Interval directly to its right)
@@ -537,9 +646,23 @@ public class GUI extends Application {
      */
     private void moveIntervalRightHandler(ActionEvent e) {
         sequence.moveIntervalRight(lvIntervals.getSelectionModel().getSelectedIndex());
-        updateSequenceViewer();
+        updateIntervalsGraphics();
     }
-    //      *** ...for the timer buttons
+    //      *** ...for the profile components
+
+    private void loadProfileHandler(ActionEvent e) {
+        loadProfile();
+    }
+    private void saveProfileHandler(ActionEvent e) {
+        saveProfile();
+    }
+    private void deleteProfileHandler(ActionEvent e) {
+        deleteProfile();
+    }
+    private void setDefaultProfileHandler(ActionEvent e) {
+        setDefaultProfile();
+    }
+    //      *** ...for the timer components
     /**
      * Handler: starts the timer
      * @param e ActionEvent
@@ -570,6 +693,11 @@ public class GUI extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
+
+        for (String each: getProfiles()) {
+            System.out.println(each);
+        }
+
         Pane root = new Pane();
         Scene scene = new Scene(root, WINDOW_W, WINDOW_H); // size of the window
         scene.getStylesheets().add("resources/css/" + STYLE + ".css");
@@ -581,11 +709,17 @@ public class GUI extends Application {
         canvasBG = new Canvas(WINDOW_W, WINDOW_H);
         gcBG = canvasBG.getGraphicsContext2D();
         // CREATE the Sequence Editor objects
+        //  - Profile components
+        cbProfiles = new ComboBox(profilesList); // TODO: add the list of Profiles
+        btnSaveProfile = new Button("SAVE");
+        btnLoadProfile = new Button("LOAD");
+        btnDeleteProfile = new Button("DELETE");
+        btnSetDefaultProfile = new Button("SET AS DEFAULT");
+        lblProfiles = new Label("(profiles)");
         //  - ListView of sequence intervals
-        lblInterval = new Label("SESSION");
+        lblInterval = new Label("PRAYER SESSION");
         lvIntervals = new ListView<String>();
         //  - Duration editor components
-        lblDuration = new Label("(duration)");
         tfDuration = new TextField();
         btnSetDuration = new Button("SET");
         //  - Sequence Editor buttons
@@ -611,10 +745,12 @@ public class GUI extends Application {
         // TODO: 3. Add components to the root
         //  - Background components
         root.getChildren().addAll(canvasBG);
+        //  - Profile components
+        root.getChildren().addAll(cbProfiles, btnSaveProfile, btnLoadProfile, btnDeleteProfile, btnSetDefaultProfile, lblProfiles);
         //  - Sequence Editor components
         root.getChildren().addAll(lvIntervals, lblInterval,
                 btnAddInterval,btnMoveIntervalLeft, btnMoveIntervalRight, btnDeleteInterval,
-                lblDuration, tfDuration, btnSetDuration);
+                tfDuration, btnSetDuration);
         //  - Sound options
         root.getChildren().addAll(lblPrimSound, lblSecondSound,
                 cbMainSound, btnPlayMainSound, cbSecondSound, btnPlaySecondSound);
@@ -624,6 +760,20 @@ public class GUI extends Application {
         // TODO: 4. Configure the components (colors, fonts, size, location)
         // CONFIGURE the background
         gcBG.drawImage(new Image("resources/images/" + STYLE + "/background.png"), 0, 0, WINDOW_W, WINDOW_H);
+        // CONFIGURE the Profile components
+        double PROF_H = COMP_H / 2;
+        cbProfiles.setPrefHeight(COMP_H / 2);
+        cbProfiles.getSelectionModel().select(sequence.getDefaultProfile());
+        btnSaveProfile.setPrefHeight(PROF_H);
+        btnSaveProfile.getStyleClass().add("button-profile");
+        btnLoadProfile.setPrefHeight(PROF_H);
+        btnLoadProfile.getStyleClass().add("button-profile");
+        btnDeleteProfile.setPrefHeight(PROF_H);
+        btnDeleteProfile.getStyleClass().add("button-profile");
+        btnSetDefaultProfile.getStyleClass().add("button-profile");
+        btnSetDefaultProfile.setPrefHeight(PROF_H);
+        lblProfiles.getStyleClass().add("secondary-label");
+        lblProfiles.setAlignment(Pos.BASELINE_LEFT);
         // CONFIGURE the Sequence Editor objects
         //  - ListView of sequence intervals
         lblInterval.setMaxWidth((COMP_MAX_W - PADDING) * 0.75);
@@ -633,26 +783,23 @@ public class GUI extends Application {
         lvIntervals.setPrefHeight(COMP_H + PADDING);
         lvIntervals.setOrientation(Orientation.HORIZONTAL);
         //  - Duration editor components
-        lblDuration.getStyleClass().add("secondary-label");
-        lblDuration.setPrefWidth((COMP_MAX_W - PADDING) * 0.25);
-        lblDuration.setAlignment(Pos.BASELINE_LEFT);
         tfDuration.setPrefWidth((COMP_MAX_W - PADDING) * 0.25);
         tfDuration.setPrefHeight(COMP_H / 2);
-        tfDuration.setText("slct an ntrvl");
+        tfDuration.setText("(duration)");
         btnSetDuration.setPrefWidth((COMP_MAX_W - PADDING) * 0.25);
         btnSetDuration.setPrefHeight(COMP_H / 2);
         btnSetDuration.getStyleClass().add("button-set");
         //  - Sequence Editor buttons
-        btnAddInterval.setPrefSize(((COMP_MAX_W - PADDING * 2) * 0.75) / 2, COMP_H);
+        btnAddInterval.setPrefSize((COMP_MAX_W - PADDING) * 0.5, COMP_H);
         btnAddInterval.getStyleClass().add("button-add");
         btnAddInterval.setAlignment(Pos.TOP_RIGHT);
-        btnDeleteInterval.setPrefSize(((COMP_MAX_W - PADDING * 2) * 0.75) / 2, COMP_H);
+        btnDeleteInterval.setPrefSize((COMP_MAX_W - PADDING) * 0.5, COMP_H);
         btnDeleteInterval.getStyleClass().add("button-delete");
         btnDeleteInterval.setAlignment(Pos.TOP_LEFT);
-        btnMoveIntervalLeft.setPrefSize(((COMP_MAX_W - PADDING * 2) * 0.75) / 2, COMP_H);
+        btnMoveIntervalLeft.setPrefSize((COMP_MAX_W - PADDING) * 0.5, COMP_H);
         btnMoveIntervalLeft.getStyleClass().add("button-move-l");
         btnMoveIntervalLeft.setAlignment(Pos.BOTTOM_RIGHT);
-        btnMoveIntervalRight.setPrefSize(((COMP_MAX_W - PADDING * 2) * 0.75) / 2, COMP_H);
+        btnMoveIntervalRight.setPrefSize((COMP_MAX_W - PADDING) * 0.5, COMP_H);
         btnMoveIntervalRight.getStyleClass().add("button-move-r");
         btnMoveIntervalRight.setAlignment(Pos.BOTTOM_LEFT);
         // CONFIGURE Sound options
@@ -700,6 +847,11 @@ public class GUI extends Application {
         btnDeleteInterval.setOnAction(this::deleteIntervalHandler);
         btnMoveIntervalLeft.setOnAction(this::moveIntervalLeftHandler);
         btnMoveIntervalRight.setOnAction(this::moveIntervalRightHandler);
+        //  - Profile component handlers
+        btnLoadProfile.setOnAction(this::loadProfileHandler);
+        btnSaveProfile.setOnAction(this::saveProfileHandler);
+        btnDeleteProfile.setOnAction(this::deleteProfileHandler);
+        btnSetDefaultProfile.setOnAction(this::setDefaultProfileHandler);
         //  - Timer button handlers
         btnStartTimer.setOnAction(this::startTimerHandler);
         btnStopTimer.setOnAction(this::stopTimerHandler);
@@ -710,9 +862,9 @@ public class GUI extends Application {
         stage.show();
 
         // Show this after the stage so that we can get the width of components (for displaying things correctly)
-        Thread.sleep(1000);
         drawStaticComponents();
-        updateSequenceViewer();
+        updateProfilesGraphics();
+        updateIntervalsGraphics();
     }
 
     /**
