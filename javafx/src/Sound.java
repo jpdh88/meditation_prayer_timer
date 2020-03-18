@@ -2,8 +2,10 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 import javax.sound.sampled.*;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,22 +15,22 @@ import java.util.Set;
  * Represents a Sound object. A Sound object stores the sound to be used in an Interval, information related to that
  * sound, a list of all the available sounds, etc.
  *
+ * re: playing sounds (re: playing sounds (https://stackoverflow.com/questions/44348971/playing-sound-from-jar-file)
+ *
  * @author Joseph Haley
  */
 public class Sound {
     // VARIABLES
-    /** Directory where all the sounds are located **/
-    private static String soundsDir = "src/resources/sounds/";
-    /** List of sounds available to the user **/
+    /** Directory where all the sounds are located */
+    private static String soundsDir = "resources/sounds/";
+    /** List of sounds available to the user */
     private static Map<String, String> soundList = new HashMap<String, String>(); // this map is populated in the Constructor
-    /** The name of the sound chosen for this Sound object **/
+    /** The name of the sound chosen for this Sound object */
     private String soundName; // represents a key in the soundList Map
-    /** The AudioInputStream object of the chosen sound **/
-    private AudioInputStream soundStream;
-    /** The AudioFormat object of the chosen sound **/
-    private AudioFormat soundStreamFormat; // for getting information about the sound file
-    /** length of a sound clip **/
-    public static final long CLIP_DURATION_MS = 15000; // in milliseconds
+    /** The AudioInputStream object of the chosen sound */
+    private static AudioInputStream audioInputStream;
+    /** The clip that will be played */
+    private static Clip clip;
 
 
     // METHODS
@@ -47,22 +49,6 @@ public class Sound {
         soundList.put("Seashore", soundsDir + "seashore.wav");
         soundList.put("Cafe", soundsDir + "cafe.wav");
         soundList.put("Gibberish", soundsDir + "gibberish.wav");
-    }
-    /**
-     * Creates an AudioInputStream from a file path
-     * @param soundName The path of the sound (found in the soundList)
-     * @return An AudioInputStream for the sound path passed to the function
-     * @throws Exception
-     */
-    public static AudioInputStream createSoundStream(String soundName) throws Exception {
-        AudioInputStream soundStream = null;
-        try {
-            File soundFile = new File(soundName);
-            soundStream = AudioSystem.getAudioInputStream(soundFile);
-        } catch (Exception e) {
-            System.out.println("Sound Class Exception in setSoundStream method\n\t" + e);
-        }
-        return soundStream;
     }
 
     /**
@@ -107,100 +93,34 @@ public class Sound {
     }
 
     /**
-     * Plays a sound using JavaFX tools
+     * Plays a sound
      * @param soundName the name of the sound
      */
-    public static void playSoundJFX(String soundName) {
-        String musicFile = Sound.getPathFromSoundList(soundName);
-
-        Media sound = new Media(new File(musicFile).toURI().toString());
-
-        MediaPlayer mediaPlayer = new MediaPlayer(sound);
-
+    public static void playSound(String soundName) {
         Thread soundThread = new Thread() {
             public void run() {
-                mediaPlayer.play();
-            }
-        };
-
-        soundThread.start();
-    }
-
-    /**
-     * Plays an AudioInputStream (sound file)
-     *  - From: https://stackoverflow.com/questions/577724/trouble-playing-wav-in-java/577926#577926
-     *  Also looked at these:
-     *      - From: https://stackoverflow.com/questions/26305/how-can-i-play-sound-in-java
-     *      - From: https://www3.ntu.edu.sg/home/ehchua/programming/java/J8c_PlayingSound.html
-     *      - From: https://stackoverflow.com/tags/javasound/info
-     *
-     * @param audioInputStream The sound stream to be played
-     */
-    public static void playSound(AudioInputStream audioInputStream) {
-        /**
-         * Checks the status of a playing sound file for if it is playing or not
-         */
-        class AudioListener implements LineListener {
-
-            // sentinel flag: has the sound stopped playing?
-            private boolean done = false;
-
-            // checks to see if the sound is still playing; if its not, it will set done = true
-            @Override public synchronized void update(LineEvent event) {
-                LineEvent.Type eventType = event.getType();
-                if (eventType == LineEvent.Type.STOP || eventType == LineEvent.Type.CLOSE) {
-                    done = true;
-                    notifyAll();
-                }
-            }
-
-            // constantly checks for a change in the sentinel flag to determine if the sound has finished
-            public synchronized void waitUntilDone() throws InterruptedException {
-                while (!done) { wait(); }
-            }
-        }
-
-        // Start the anonymous thread
-        Thread soundThread = new Thread() {
-            public void run() {
-                // Instantiate the Audio Listener
-                AudioListener listener = new AudioListener();
-
+                // Get the audio from the file
                 try {
-                    Clip clip = null;
-                    try {
-                        clip = AudioSystem.getClip();
-                    } catch (LineUnavailableException e) {
-                        e.printStackTrace();
-                    }
-                    clip.addLineListener(listener);
-                    try {
-                        clip.open(audioInputStream);
-                    } catch (LineUnavailableException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        clip.start(); // play the sound
-                        try {
-                            listener.waitUntilDone(); // start the Audio Listener
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    } finally {
-                        clip.close();
-                    }
-                } finally {
-                    try {
-                        audioInputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    // Convert the file path string to a URL
+                    System.out.println(Sound.getPathFromSoundList(soundName));
+                    URL sound = getClass().getResource(Sound.getPathFromSoundList(soundName));
+                    System.out.println(sound);
+
+                    // Get audio input stream from the file
+                    audioInputStream = AudioSystem.getAudioInputStream(sound);
+
+                    // Get clip resource
+                    clip = AudioSystem.getClip();
+
+                    // Open clip from audio input stream
+                    clip.open(audioInputStream);
+                } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+                    e.printStackTrace();
                 }
+
+                clip.start();
             }
         };
-
         soundThread.start();
     }
 
@@ -234,11 +154,6 @@ public class Sound {
     public void setSound(String soundName) {
         if (soundList.containsKey(soundName)) {
             setSoundName(soundName);
-            try {
-                setSoundStream(soundName);
-            } catch (Exception e) {
-                System.out.println("Sound Class Exception in setSound method\n\t" + e);
-            }
         } else {
             System.out.println("Sound Class Error: that sound does not exist.");
         }
@@ -262,37 +177,6 @@ public class Sound {
     public String getSoundName() {
         return soundName;
     }
-    /**
-     * Sets the soundStream according to the soundName given
-     * @param soundName The name of the sound (from the soundList)
-     */
-    private void setSoundStream(String soundName) throws Exception {
-        try {
-            soundStream = Sound.createSoundStream(soundList.get(soundName));
-            soundStreamFormat = soundStream.getFormat();
-        } catch (Exception e) {
-            System.out.println("Sound Class Error: " + e);
-        }
-    }
-
-    /**
-     * Gets the soundStream
-     * @return the soundStream AudioInputStream object
-     */
-    public AudioInputStream getSoundStream() {
-        return soundStream;
-    }
-
-    /**
-     * Gets the duration of the chosen sound
-     * @return Duration of the sound in milliseconds
-     */
-    public double getSoundDuration() {
-        long frames = soundStream.getFrameLength();
-        double soundDuration = (frames+0.0) / soundStreamFormat.getFrameRate();
-
-        return soundDuration * 1000;
-    }
 
     // *** Utility Methods
 
@@ -314,10 +198,12 @@ public class Sound {
         Sound mySound = new Sound("Meditation Bell 1");
         System.out.println(mySound.getSoundList());
         System.out.println(mySound.getSoundName().toString());
-        System.out.println(mySound.getSoundStream());
-        System.out.println(mySound.getSoundDuration());
-        AudioInputStream mystream = mySound.getSoundStream();
+//        System.out.println(mySound.getSoundStream());
+//        System.out.println(mySound.getSoundDuration());
+//        AudioInputStream mystream = mySound.getSoundStream();
         // mySound.playSound();
         System.out.println(Sound.getSoundIndex("Church Bell 2"));
+
+        //System.out.println(mySound.directory);
     }
 }
