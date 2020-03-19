@@ -9,6 +9,9 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -16,8 +19,10 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.File;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * A GUI example of meditation xtimer
@@ -168,6 +173,15 @@ public class Main extends Application {
                 boolean hasUpdatedProgress = false;
                 double lastProgressUpdate = 0;
 
+                // Robot that simulates mouse movement (to prevent screen from sleeping)
+                Robot mouseMover = null;
+                try {
+                    mouseMover = new Robot();
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
+                Point pObj;
+
                 // Always start of the timer with the main sound
                 Sound.playSound(sequence.getMainSoundName());
                 /*String musicFile2 = Sound.getPathFromSoundList(sequence.getMainSoundName());
@@ -221,6 +235,13 @@ public class Main extends Application {
                     if (elapsedTime >= totalDuration) {
                         keepTimerRunning = false;
                     }
+
+                    // Move the mouse to keep the screen from sleeping (every 10 seconds)
+                    if (elapsedTime % 10000 > 0 && elapsedTime % 10000 < 10) {
+                        pObj = MouseInfo.getPointerInfo().getLocation();
+                        mouseMover.mouseMove(pObj.x + 1, pObj.y + 1);
+                        mouseMover.mouseMove(pObj.x - 1, pObj.y - 1);
+                    }
                 }
                 // Check to see if the Timer is paused
                 if (timerIsPaused) {
@@ -232,6 +253,7 @@ public class Main extends Application {
         };
         timerThread.start();
     }
+
     /**
      * Stops the timer
      */
