@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="author" content="Joseph Haley">
+        <meta name="date" content="July 2020">
+        <meta name="keywords" content="HTML,CSS,JavaScript">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Meditation timer implemented in Vue.JS. What I wanted to learn: ---Vue.JS basics by taking an app I originally implemented in vanilla Javascript and implementing it in Vue.JS; ---After implementing a first version, it made sense to re-design and re-write a large chunk of the app to take advantage of Vue features like custom components.">
+
+        <title>Meditation/Prayer Timer</title>
+        <link rel="stylesheet" href="./main.css" type="text/css">
+    </head>
+    <body>
+        <div id="loading-screen">
+            Lohoading... for some reason...
+        </div>
+        <div id="hint-box">
+            here
+        </div>
+        <div id="bg-container">
+
+        </div>
+        <div id="app-container">
+            <div id="hint-settings">
+                <input type="checkbox" id="cb-display-hints" checked>
+                <label for="cb-display-hints">toggle hints</label>
+            </div>
+            <div id="app">
+                <div id="app-profiles" class="app-section">
+                    <div    id="lbl-app-profiles"
+                            class="lbl-app"
+                            data-hint="Profiles section">profiles</div>
+                    <details    id="dd-profiles-list"
+                                class="elt-form elt-widget"
+                                :class="{ disabled: this.timerProps.isOn }"
+                                data-hint="Profiles are saved to local storage, so they won't be deleted until the browser's cache is deleted. Profiles save session intervals and the primary and secondary sound choices.">
+                        <summary v-if="currentProfile == -1">Current profile: (none)</summary>
+                        <summary v-else>Current profile: {{ currentProfile }} {{ formatDate(profiles[currentProfile].date) }}</summary>
+                        <div>
+                            <profile    class="comp-profile"
+                                        v-for="(profile, key) in profiles"
+                                        :key="key" :profile-info="profile" 
+                                        :profile-num="parseInt(key)" 
+                                        :current-profile="currentProfile" 
+                                        v-model="actOnProfile"></profile>
+                        </div>
+                    </details>
+                </div>
+                <div id="app-sounds" class="app-section">
+                    <div    id="lbl-app-sounds" 
+                            class="lbl-app"
+                            data-hint="Sounds section. The primary sound is played at the beginning and end of a session. The secondary sound is played at the beginning of intervals (unless there is only one interval).">sounds</div>
+                    <div id="lbl-sounds-prim" class="elt-lbl">
+                        (primary sound)
+                    </div>
+                    <select id="dd-sounds-prim" 
+                            class="elt-widget elt-form" 
+                            v-model="session.primSound" 
+                            @change="loadPrimSound()" 
+                            :disabled="this.timerProps.isOn" 
+                            data-hint="A list of the available primary sounds.">
+                        <option v-for="(sound, key) in sounds"
+                                :value="key">
+                            {{ sound.name }}
+                        </option>
+                    </select>
+                    <button type="button" 
+                            id="btn-sounds-play-prim" 
+                            class="elt-widget elt-btn" 
+                            @click="playPrimSound()" 
+                            :disabled="this.timerProps.isOn" 
+                            data-hint="Play the currently-selected primary sound.">
+                        <div class="triangle-right"></div>
+                    </button>
+                    <audio id="audio-sound-prim"></audio>
+
+                    <div id="lbl-sounds-sec" class="elt-lbl">
+                        (secondary sound)
+                    </div>
+                    <select id="dd-sounds-sec" 
+                            class="elt-widget elt-form" 
+                            v-model="session.secSound" 
+                            @change="loadSecSound()" 
+                            :disabled="this.timerProps.isOn" 
+                            data-hint="A list of the available secondary sounds.">
+                        <option v-for="(sound, key) in sounds" v-bind:value="key">
+                            {{ sound.name }}
+                        </option>
+                    </select>
+                    <button type="button" 
+                            id="btn-sounds-play-sec" 
+                            class="elt-widget elt-btn"  
+                            @click="playSecSound()" 
+                            :disabled="this.timerProps.isOn" 
+                            data-hint="Play the currently-selected secondary sound.">
+                        <div class="triangle-right"></div>
+                    </button>
+                    <audio id="audio-sound-sec"></audio>
+                </div>
+                <div id="app-settings" class="app-section">
+                    <div    id="lbl-app-settings"
+                            class="lbl-app"
+                            data-hint="Session section. A session is made up of one or more intervals.">session</div>
+                    <div    id="lv-settings-intervals" 
+                            class="elt-widget" 
+                            :class="{ disabled: this.timerProps.isOn }">
+                        <transition-group tag="div" name="trans-intervals">
+                            <interval   v-for="(interval, index) in session.intervals.concat({duration: -1, id:0})" 
+                                        :key="interval.id" 
+                                        :interval-num="index + 1" 
+                                        :duration="interval.duration" 
+                                        @send-directive="actOnInterval = $event"
+                                        class="interval">
+                                <!-- https://stackoverflow.com/questions/41475447/vue-v-onclick-does-not-work-on-component -->
+                            </interval>
+                        </transition-group>
+                    </div>
+                </div>
+                <div id="app-timer">
+                    <button type="button" 
+                            id="btn-timer-start" 
+                            class="elt-btn-timer" 
+                            v-show="!this.timerProps.isOn" 
+                            @click="startTimer()" 
+                            data-hint="Starts the current session.">
+                        begin session
+                    </button>
+                    <button type="button" 
+                            id="btn-timer-end" 
+                            class="elt-btn-timer" 
+                            v-show="this.timerProps.isOn" 
+                            @click="endTimer()" 
+                            data-hint="Ends the currently running session.">
+                        end
+                    </button>
+                    <button type="button" 
+                            id="btn-timer-pause" 
+                            class="elt-btn-timer" 
+                            v-show="this.timerProps.isOn && !this.timerProps.isPaused" 
+                            @click="pauseTimer()" 
+                            data-hint="Pauses the currently running session.">
+                        pause
+                    </button>
+                    <button type="button" 
+                            id="btn-timer-continue" 
+                            class="elt-btn-timer" 
+                            v-show="this.timerProps.isOn && this.timerProps.isPaused" 
+                            @click="continueTimer()" 
+                            data-hint="Continues the currently paused session.">
+                        continue
+                    </button>
+                </div>
+                <div id="sb-timer">
+                </div>
+            </div>
+        </div>
+
+        <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+        <script src="./timer_vue.js">
+        </script>
+        
+        <script src="../ui_things/ui_info_box.js"></script>
+        <script>
+            const ib = new InfoBox();
+            ib.toBottomRight();
+        </script>
+    </body>
+</html>
