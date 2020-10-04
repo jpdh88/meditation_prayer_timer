@@ -6,7 +6,7 @@
         <meta name="date" content="July 2020">
         <meta name="keywords" content="HTML,CSS,JavaScript">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="This is a prayer/meditation timer I originally coded in Java. What I wanted to do/learn: -more complex UI; -using localStorage">
+        <meta name="description" content="This is a vanilla Javascript version of a meditation timer I originally coded in Java. What I wanted to accomplish: ---implement a complex user-interface that changes depending on the state the application is in (whether the timer is running, paused, or off); ---organize variables and methods in a clean manner by putting them within objects; ---use localStorage to save several different profiles; ---(ultimately, whatever was necessary to make the app as close to the Java version as possible)">
 
         <title>Meditation/Prayer Timer</title>
         <link rel="stylesheet" href="./main.css" type="text/css">
@@ -19,6 +19,10 @@
 
         </div>
         <div id="app-container">
+            <div id="hint-settings">
+                <input type="checkbox" id="cb-display-hints">
+                <label for="cb-display-hints">Toggle hints</label>
+            </div>
             <div id="app">
                 <div id="app-profiles">
                     <select id="dd-profiles-list" name="profiles_list" class="elt-form elt-widget" data-hint="Profiles are saved using local storage, so they won't be deleted until the browser's cache is deleted. Profiles save session intervals and the primary and secondary sounds.">
@@ -102,10 +106,6 @@
                         &#9654;
                     </button>
                 </div>
-            </div>
-            <div id="hint-settings">
-                <input type="checkbox" id="cb-display-hints">
-                <label for="cb-display-hints">Toggle hints</label>
             </div>
         </div>
 

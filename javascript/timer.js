@@ -437,8 +437,9 @@ var timer = {
     },
     action: {
         start: function() {
-            timer.schedule = [...session.intervals];
-            console.log(timer.schedule);
+            // timer.schedule = [...session.intervals];
+            timer.schedule = JSON.parse(JSON.stringify(session.intervals));
+            
         
             sounds.prim.play();
         
@@ -603,21 +604,21 @@ var handler = {
             let selectedSound = document.getElementById("dd-sounds-prim").selectedIndex;
 
             session.primSound = selectedSound;
-            sounds.primSoundEle.src = soundList[session.primSound][1];
-            sound.primSoundEle.load();
+            sounds.prim.ele.src = soundList[session.primSound][1];
+            sounds.prim.ele.load();
         },
         playPrim: function() {
-            primSoundEle.play();
+            sounds.prim.ele.play();
         },
         setSec: function() {
             let selectedSound = document.getElementById("dd-sounds-sec").selectedIndex;
 
             session.secSound = selectedSound;
-            sounds.secSoundEle.src = soundList[session.secSound][1];
-            sounds.secSoundEle.load();
+            sounds.sec.ele.src = soundList[session.secSound][1];
+            sounds.sec.ele.load();
         },
         playSec: function() {
-            sounds.secSoundEle.play();
+            sounds.sec.ele.play();
         }
     }
 }
